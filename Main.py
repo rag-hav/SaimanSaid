@@ -1,6 +1,6 @@
 import praw
 import os
-
+import time
 #print((os.environ.get("praw_CLIENT_ID"),
 os.environ.get("praw_CLIENT_SECRET"),
 os.environ.get("praw_USER_AGENT"),
@@ -16,4 +16,5 @@ reddit = praw.Reddit(client_id=os.environ.get("praw_CLIENT_ID"),
 
 post_id='fueek3'
 submission=reddit.submission(post_id).reply("This is a not a tse from heroku s")
-
+print("done")
+time.sleep(202029)
