@@ -33,7 +33,7 @@ def randomQuote():
 
     msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
         f'[Saiman\'s Video](<{youtubeLink}> "Did you expect the spanish inquisition")  \n' + \
-        '***\n^^I ^^am ^^a ^^bot, ^^^contact ^^^u/I_eat_I_repeat ^^^^to ^^^^report ^^^^any ^^^^error'
+        '***\n^^I ^^am ^^a ^^bot, ^^^contact ^^^u/I_eat_I_repeat ^^^^to ^^^^report ^^^^any ^^^^error. [^^^About](redd.it/fvkvw9)'
 
     return msg
 
@@ -77,9 +77,8 @@ def main():
                          username=os.environ.get("praw_USERNAME"),
                          password=os.environ.get("praw_PASSWORD"))
 
-    SaimanSays = reddit.subreddit("testingground4bots")
+    SaimanSays = reddit.subreddit("SaimanSays")
     replyedIds = getReplyedIds()
-    print(replyedIds)
     for comment in SaimanSays.stream.comments():
         if comment.id not in replyedIds and re.search(
                 r"Bhendi", comment.body, re.I):
@@ -88,6 +87,4 @@ def main():
             replyToComment(comment)
             print("Success")
             writeReplyedId(comment.id)
-
-
 main()
