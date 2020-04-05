@@ -23,20 +23,23 @@ def random_quote():
     quote = random.choice(quotes.split('\n\n'))
     quoteTime = re.match(r"(\d\d):(\d\d):(\d\d)", quote)
     hh, mm, ss = quoteTime.groups()
-    if ss == '00':
-        mm = str(int(mm) - 1)
-        ss = '59'
-    else:
-        ss = str(int(ss) - 1)
 
     youtubeLink = f"https://youtu.be/{subFile[-15:-4]}/?t={hh}h{mm}m{ss}s"
     quoteText = re.sub("^.*\n", '', quote)
 
     msg = '>' + quoteText.replace('\n', '  \n>') + \
-        f'\n\n&nbsp;\n\n[Source](<{youtubeLink}>"Did you expect the spanish inquisition")  \n'
+        '\n\n&nbsp;\n\n' + f'[Source](<{youtubeLink}>"Did you expect the spanish inquisition")  \n'
     print(msg)
     return msg
 
+
+def getReplyedIds():
+    with open('replyedIds','r') as fileObj:
+        ids_text=fileObj.read()
+    return(ids_text.split())
+def writeReplyedId(Id):
+    with open('replyedIds','a') as fileObj:
+        fileObj.write(Id+'\n')
 
 def main():
     reddit = praw.Reddit(client_id=os.environ.get("praw_CLIENT_ID"),
@@ -46,8 +49,10 @@ def main():
                          password=os.environ.get("praw_PASSWORD"))
 
     SaimanSays = reddit.subreddit("testingground4bots")
+    replyedIds=getReplyedIds()
     for comment in SaimanSays.stream.comments():
-        if re.search(r"TriggerWord", comment.body, re.I):
+        if comment.id not in replyedIds and re.search(r"TriggerWord", comment.body, re.I):
             comment.reply(random_quote())
+            writeReplyedId(comment.id)
 
 random_quote()
