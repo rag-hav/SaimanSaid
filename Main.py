@@ -12,7 +12,7 @@ from pprint import pprint
 # os.environ.get("praw_PASSWORD")))
 
 
-def random_quote():
+def randomQuote():
     subFile = random.choice(["subs/" +
                              a for a in os.listdir("subs/")] +
                             ["subs/done/" +
@@ -22,24 +22,53 @@ def random_quote():
         quotes = subFile_.read()
     quote = random.choice(quotes.split('\n\n'))
     quoteTime = re.match(r"(\d\d):(\d\d):(\d\d)", quote)
-    hh, mm, ss = quoteTime.groups()
+    try:
+        hh, mm, ss = quoteTime.groups()
+    except AttributeError:
+        return randomQuote()
 
     youtubeLink = f"https://youtu.be/{subFile[-15:-4]}/?t={hh}h{mm}m{ss}s"
+
     quoteText = re.sub("^.*\n", '', quote)
 
-    msg = '>' + quoteText.replace('\n', '  \n>') + \
-        '\n\n&nbsp;\n\n' + f'[Source](<{youtubeLink}>"Did you expect the spanish inquisition")  \n'
-    print(msg)
+    msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
+        f'[Saiman\'s Video](<{youtubeLink}> "Did you expect the spanish inquisition")  \n' + \
+        '***\n^^I ^^am ^^a ^^bot, ^^^contact ^^^u/I_eat_I_repeat ^^^^to ^^^^report ^^^^any ^^^^error'
+
     return msg
 
 
 def getReplyedIds():
-    with open('replyedIds','r') as fileObj:
-        ids_text=fileObj.read()
+    if not os.path.isfile('replyedIds'):
+        print('No History file present')
+        return []
+    with open('replyedIds', 'r') as fileObj:
+        ids_text = fileObj.read()
     return(ids_text.split())
+
+
 def writeReplyedId(Id):
-    with open('replyedIds','a') as fileObj:
-        fileObj.write(Id+'\n')
+    with open('replyedIds', 'a') as fileObj:
+        fileObj.write(Id + '\n')
+
+
+def replyToComment(comment):
+    try:
+        comment.reply(randomQuote())
+    except praw.exceptions.APIException as e:
+        if e.field == 'ratelimit':
+            sleepTime, time_type = re.search(
+                r'(\d+) ([ms])', e.message).groups()
+            sleepTime = int(sleepTime)
+            if time_type == 'm':
+                sleepTime = sleepTime * 60 + 10
+
+            print("RateLimit sleeping for", sleepTime)
+            time.sleep(sleepTime + 5)
+            replyToComment(comment)
+        else:
+            raise e
+
 
 def main():
     reddit = praw.Reddit(client_id=os.environ.get("praw_CLIENT_ID"),
@@ -49,10 +78,16 @@ def main():
                          password=os.environ.get("praw_PASSWORD"))
 
     SaimanSays = reddit.subreddit("testingground4bots")
-    replyedIds=getReplyedIds()
+    replyedIds = getReplyedIds()
+    print(replyedIds)
     for comment in SaimanSays.stream.comments():
-        if comment.id not in replyedIds and re.search(r"TriggerWord", comment.body, re.I):
-            comment.reply(random_quote())
+        if comment.id not in replyedIds and re.search(
+                r"Bhendi", comment.body, re.I):
+
+            print(f"Replying to '{comment.id}'")
+            replyToComment(comment)
+            print("Success")
             writeReplyedId(comment.id)
 
-random_quote()
+
+main()
