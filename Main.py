@@ -32,8 +32,8 @@ def randomQuote():
     quoteText = re.sub("^.*\n", '', quote)
 
     msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
-        f'[Saiman\'s Video](<{youtubeLink}> "Did you expect the spanish inquisition")  \n' + \
-        '***\n^^I ^^am ^^a ^^bot, ^^^contact ^^^u/I_eat_I_repeat ^^^^to ^^^^report ^^^^any ^^^^error. [^^^About](redd.it/fvkvw9)'
+        f'[Quote Sauce](<{youtubeLink}> "Did you expect the spanish inquisition")  \n' + \
+        '***\n^^I ^^am ^^a ^^bot, ^^contact ^^u/I_eat_I_repeat ^^^to ^^^report ^^^any ^^^(error.&#x2005;[About&#x2005;bot](/redd.it/fvkvw9)) '
 
     return msg
 
