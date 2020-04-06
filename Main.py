@@ -22,13 +22,14 @@ def randomQuote():
     with open(subFile, 'r') as subFile_:
         quotes = subFile_.read()
     quote = random.choice(quotes.split('\n\n'))
+
     quoteTime = re.match(r"(\d\d):(\d\d):(\d\d)", quote)
     try:
         hh, mm, ss = quoteTime.groups()
     except AttributeError:
         return randomQuote()
 
-    videoId=os.path.basename(subFile)
+    videoId = os.path.basename(subFile)
     youtubeLink = f"https://youtu.be/{videoId}/?t={hh}h{mm}m{ss}s"
 
     quoteText = re.sub("^.*\n", '', quote)
@@ -90,6 +91,7 @@ def main():
             print("Success")
             writeReplyedId(comment.id)
 
+
 def infinite():
     try:
         main()
@@ -97,5 +99,6 @@ def infinite():
         print(e)
         time.sleep(300)
         infinite()
+
 
 infinite()
