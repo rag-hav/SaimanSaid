@@ -1,5 +1,6 @@
 import os
 import praw
+from prawcore.exceptions import *
 import random
 import re
 import sys
@@ -27,13 +28,13 @@ def randomQuote():
     except AttributeError:
         return randomQuote()
 
-    youtubeLink = f"https://youtu.be/{subFile[-15:-4]}/?t={hh}h{mm}m{ss}s"
+    youtubeLink = f"https://youtu.be/{subFile}/?t={hh}h{mm}m{ss}s"
 
     quoteText = re.sub("^.*\n", '', quote)
 
     msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
         f'[Quote Sauce](<{youtubeLink}> "Did you expect the spanish inquisition")  \n' + \
-        '***\n^^I ^^am ^^a ^^bot, ^^contact ^^u/I_eat_I_repeat ^^^to ^^^report ^^^any ^^^(error.&#x2005;[About&#x2005;bot](/redd.it/fvkvw9)) '
+        '***\n^^I ^^am ^^a ^^bot, ^^contact ^^u/I_eat_I_repeat ^^^to ^^^report ^^^any ^^^(error.&#x2005;[About](/redd.it/fvkvw9)) '
 
     return msg
 
@@ -87,4 +88,13 @@ def main():
             replyToComment(comment)
             print("Success")
             writeReplyedId(comment.id)
-main()
+
+def infinite():
+    try:
+        main()
+    except RequestException as e:
+        print(e)
+        time.sleep(300)
+        infinite()
+
+infinite()
