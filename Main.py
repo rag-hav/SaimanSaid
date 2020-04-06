@@ -28,7 +28,9 @@ def randomQuote():
     except AttributeError:
         return randomQuote()
 
-    youtubeLink = f"https://youtu.be/{subFile}/?t={hh}h{mm}m{ss}s"
+    videoId=os.path.basename(subFile)
+    youtubeLink = f"https://youtu.be/{videoId}/?t={hh}h{mm}m{ss}s"
+    print('\n'*9,subFile,youtubeLink)
 
     quoteText = re.sub("^.*\n", '', quote)
 
@@ -97,4 +99,4 @@ def infinite():
         time.sleep(300)
         infinite()
 
-infinite()
+randomQuote()
