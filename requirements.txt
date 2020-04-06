@@ -1,4 +1,0 @@
-praw==6.5.1
-prawcore==1.0.1
-update-checker==0.16
-websocket-client==0.57.0

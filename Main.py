@@ -41,20 +41,6 @@ def randomQuote():
     return msg
 
 
-def getReplyedIds():
-    if not os.path.isfile('replyedIds'):
-        print('No History file present')
-        return []
-    with open('replyedIds', 'r') as fileObj:
-        ids_text = fileObj.read()
-    return(ids_text.split())
-
-
-def writeReplyedId(Id):
-    with open('replyedIds', 'a') as fileObj:
-        fileObj.write(Id + '\n')
-
-
 def replyToComment(comment):
     try:
         comment.reply(randomQuote())
@@ -81,15 +67,16 @@ def main():
                          password=os.environ.get("praw_PASSWORD"))
 
     SaimanSays = reddit.subreddit("SaimanSays")
-    replyedIds = getReplyedIds()
+    me = reddit.user.me()
+
     for comment in SaimanSays.stream.comments():
-        if comment.id not in replyedIds and re.search(
+        if not comment.saved and comment.author != me and re.search(
                 r"Bhendi", comment.body, re.I):
 
             print(f"Replying to '{comment.id}'")
             replyToComment(comment)
             print("Success")
-            writeReplyedId(comment.id)
+            comment.save()
 
 
 def infinite():
