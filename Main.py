@@ -6,11 +6,6 @@ import re
 import sys
 import time
 from pprint import pprint
-# print((os.environ.get("praw_CLIENT_ID"),
-# os.environ.get("praw_CLIENT_SECRET"),
-# os.environ.get("praw_USER_AGENT"),
-# os.environ.get("praw_USERNAME"),
-# os.environ.get("praw_PASSWORD")))
 
 
 def randomQuote():
@@ -36,7 +31,7 @@ def randomQuote():
 
     msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
         f'[Quote Sauce](<{youtubeLink}> "Did you expect the spanish inquisition")  \n' + \
-        '***\n^^I ^^am ^^a ^^bot, ^^contact ^^u/I_eat_I_repeat ^^^to ^^^report ^^^any ^^^(error.&#x2005;[About](/redd.it/fvkvw9)) '
+        '***\n^^I am a bot, that replies to "Bhendi"<>^^^with a quote from Saiman [Know more](https://redd.it/fvkvw9)'.replace(' ', '&nbsp;').replace('<>', ' ')
 
     return msg
 
@@ -52,7 +47,7 @@ def replyToComment(comment):
             if time_type == 'm':
                 sleepTime = sleepTime * 60 + 10
 
-            print(t()+"RateLimit sleeping for", sleepTime)
+            t_print("RateLimit sleeping for", sleepTime)
             time.sleep(sleepTime + 5)
             replyToComment(comment)
         else:
@@ -60,11 +55,12 @@ def replyToComment(comment):
 
 
 def main():
-    reddit = praw.Reddit(client_id=os.environ.get("praw_CLIENT_ID"),
-                         client_secret=os.environ.get("praw_CLIENT_SECRET"),
-                         user_agent=os.environ.get("praw_USER_AGENT"),
-                         username=os.environ.get("praw_USERNAME"),
-                         password=os.environ.get("praw_PASSWORD"))
+    reddit = praw.Reddit(
+        client_id=os.environ.get("SaimanSaid_CLIENT_ID"),
+        client_secret=os.environ.get("SaimanSaid_CLIENT_SECRET"),
+        user_agent=os.environ.get("SaimanSaid_USER_AGENT"),
+        username=os.environ.get("SaimanSaid_USERNAME"),
+        password=os.environ.get("SaimanSaid_PASSWORD"))
 
     SaimanSays = reddit.subreddit("SaimanSays")
     me = reddit.user.me()
@@ -73,9 +69,9 @@ def main():
         if not comment.saved and comment.author != me and re.search(
                 r"Bhendi", comment.body, re.I):
 
-            print(t()+f"Replying to '{comment.id}'")
+            t_print(f"Replying to '{comment.id}'")
             replyToComment(comment)
-            print(t()+"\tSuccess")
+            t_print("\tSuccess")
             comment.save()
 
 
@@ -83,10 +79,16 @@ def infinite():
     try:
         main()
     except RequestException as e:
-        print(e)
+        t_print(e)
         time.sleep(300)
         infinite()
-def t():
-    return time.ctime(time.mktime(time.gmtime())+19800)+' '
-print(t()+"Starting the bot") 
+
+
+def t_print(a):
+    # print current time in string format always in IST
+    print(time.ctime(time.mktime(time.gmtime()) + 19800) + ': ' + a)
+
+
+t_print("Starting the bot")
+
 infinite()
