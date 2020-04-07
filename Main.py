@@ -75,7 +75,7 @@ def main():
 
             print(t()+f"Replying to '{comment.id}'")
             replyToComment(comment)
-            print(t()+"Success")
+            print(t()+"\tSuccess")
             comment.save()
 
 
@@ -87,6 +87,6 @@ def infinite():
         time.sleep(300)
         infinite()
 def t():
-    return time.ctime(time.mktime(time.gmtime())+19800)
+    return time.ctime(time.mktime(time.gmtime())+19800)+' '
 print(t()+"Starting the bot") 
 infinite()
