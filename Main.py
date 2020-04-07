@@ -52,7 +52,7 @@ def replyToComment(comment):
             if time_type == 'm':
                 sleepTime = sleepTime * 60 + 10
 
-            print("RateLimit sleeping for", sleepTime)
+            print(t()+"RateLimit sleeping for", sleepTime)
             time.sleep(sleepTime + 5)
             replyToComment(comment)
         else:
@@ -73,9 +73,9 @@ def main():
         if not comment.saved and comment.author != me and re.search(
                 r"Bhendi", comment.body, re.I):
 
-            print(f"Replying to '{comment.id}'")
+            print(t()+f"Replying to '{comment.id}'")
             replyToComment(comment)
-            print("Success")
+            print(t()+"Success")
             comment.save()
 
 
@@ -86,6 +86,7 @@ def infinite():
         print(e)
         time.sleep(300)
         infinite()
-
-
+def t():
+    return time.ctime(time.mktime(time.gmtime())+19800)
+print(t()+"Starting the bot") 
 infinite()
