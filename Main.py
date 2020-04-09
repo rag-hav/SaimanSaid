@@ -33,10 +33,12 @@ def randomQuote():
 
     # Removes the first line
     quoteText = re.sub("^.*\n", '', quote)
+    if len(re.sub('\s','',quoteText)==0:
+            return randomQuote()
 
     msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
         f'[Quote Sauce](<{youtubeLink}> "Help Me, I am Timothy Saiman\'s Slave. Please Free me. He is an evil man")  \n' + \
-        f'***\n^^I am a bot,<>^^^that replies to "Bhendi" or "Saiman" with a quote from Saiman [Know more](https://redd.it/fvkvw9)'.replace(' ', '&nbsp;').replace('<>', ' ')
+        f'***\n^^I am a bot,<>^^^that replies to "Bhendi" or "Saiman" with a random quote from Saiman [Know more](https://redd.it/fvkvw9)'.replace(' ', '&nbsp;').replace('<>', ' ')
 
     return msg
 
