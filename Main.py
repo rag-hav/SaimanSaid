@@ -108,7 +108,7 @@ def main():
         username=os.environ.get("SaimanSaid_USERNAME"),
         password=os.environ.get("SaimanSaid_PASSWORD"))
 
-    SaimanSays = reddit.subreddit("testingground4bots")
+    SaimanSays = reddit.subreddit("SaimanSays")
     me = reddit.user.me()
 
     for comment in SaimanSays.stream.comments():
