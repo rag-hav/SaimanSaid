@@ -33,7 +33,7 @@ def randomQuote():
 
     # Removes the first line
     quoteText = re.sub("^.*\n", '', quote)
-    if len(re.sub('\s','',quoteText)==0:
+    if len(re.sub('\s','',quoteText))==0:
             return randomQuote()
 
     msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
