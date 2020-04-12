@@ -18,6 +18,8 @@ def randomQuote():
                             ["subs/done/" +
                              a for a in os.listdir("subs/done/")] *
                             3)
+    if subFile == 'subs/done':
+        return randomQuote()
     with open(subFile, 'r') as subFile_:
         quotes = subFile_.read()
 
@@ -152,4 +154,4 @@ def infinite():
 
 
 print("Starting the bot")
-print(randomQuote())
+infinite()
