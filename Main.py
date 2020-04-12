@@ -17,27 +17,39 @@ def randomQuote():
                              a for a in os.listdir("subs/")] +
                             ["subs/done/" +
                              a for a in os.listdir("subs/done/")] *
-                            5)
+                            3)
     with open(subFile, 'r') as subFile_:
         quotes = subFile_.read()
+
     quote = random.choice(quotes.split('\n\n'))
 
-    quoteTime = re.match(r"(\d\d):(\d\d):(\d\d)", quote)
-    try:
+    if quoteTime := re.match(r"(\d\d):(\d\d):(\d\d)", quote):
         hh, mm, ss = quoteTime.groups()
-    except AttributeError:
+    else:
+        print(f"Time stamp not found in {quote=} \nof {subFile=}")
         return randomQuote()
 
     videoId = os.path.basename(subFile)
     youtubeLink = f"https://youtu.be/{videoId}/?t={hh}h{mm}m{ss}s"
 
-    # Removes the first line
+    # Removes the time stamp
     quoteText = re.sub("^.*\n", '', quote)
-    if len(re.sub('\s','',quoteText))==0:
-            return randomQuote()
+
+    # Filters
+    if len(re.sub(r'\s', '', quoteText)) == 0:
+        return randomQuote()
+    if re.search('t-series|pewdiepie|video|^welcome', quoteText, re.I):
+        return randomQuote()
+    if re.search(r'(\d\d):(\d\d):(\d\d)', quoteText):
+        print(f"Invalid format of {quote=} in {subFile=}")
+        return randomQuote()
+
+    # Formatting
+    quoteText = re.sub(r"^ ?(and|but)", '', quoteText, flags=re.I)
+    quoteText = quoteText.capitalize()
 
     msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
-        f'[Quote Sauce](<{youtubeLink}> "Help Me, I am Timothy Saiman\'s Slave. Please Free me. He is an evil man")  \n' + \
+        f'[Quote Sauce](<{youtubeLink}> "Help Me, I am Timothy, Saiman\'s Slave. Please Free me. He is an evil man")  \n' + \
         f'***\n^^I am a bot,<>^^^that replies to "Bhendi" or "Saiman" with a random quote from Saiman [Know more](https://redd.it/fvkvw9)'.replace(' ', '&nbsp;').replace('<>', ' ')
 
     return msg
@@ -48,8 +60,10 @@ def bhendiCount(sourceComment):
         "I_eat_I_repeat") + "&subject=" + urlQuote("Bhendi Titles Suggestion") + "&message=" + urlQuote("These are my suggestions:\n") + ">) | [Know more](<https://redd.it/fvkvw9>)"
     footer = '  ' + footer.replace(' ', '&nbsp;').replace('<_>', ' ')
 
-    targetUserRegex = re.search(r'u/(?P<user>\w+)', sourceComment.body, re.I)
-    if targetUserRegex:
+    if targetUserRegex := re.search(
+        r'u/(?P<user>\w+)',
+        sourceComment.body,
+            re.I):
         targetUsername = targetUserRegex.group('user')
         targetRedditor = reddit.redditor(targetUsername)
         try:
@@ -77,6 +91,8 @@ def bhendiCount(sourceComment):
 
 
 def replyToComment(comment, content):
+    '''Wrapper to handle API limit exception'''
+
     try:
         if content == 'randomQuote':
             comment.reply(randomQuote())
@@ -86,23 +102,16 @@ def replyToComment(comment, content):
 
         else:
             raise Exception()
+
     except praw.exceptions.APIException as e:
         if e.field == 'ratelimit':
-            sleepTime, time_type = re.search(
-                r'(\d+) ([ms])', e.message).groups()
-            sleepTime = int(sleepTime)
-            if time_type == 'm':
-                sleepTime = sleepTime * 60 + 10
-
-            t_print("RateLimit sleeping for", sleepTime)
-            time.sleep(sleepTime + 5)
-            replyToComment(comment)
+            time.sleep(60)
+            replyToComment(comment, content)
         else:
             raise e
 
 
 def main():
-    global reddit
     reddit = praw.Reddit(
         client_id=os.environ.get("SaimanSaid_CLIENT_ID"),
         client_secret=os.environ.get("SaimanSaid_CLIENT_SECRET"),
@@ -120,15 +129,15 @@ def main():
             r"\bSaiman\b|\bBhendi\b|\bSaimanSaid\b",
             comment.body,
                 re.I):
-            t_print(f"Replying to '{comment.id}' with random quote")
+            print(f"Replying to '{comment.id}' with random quote")
             replyToComment(comment, 'randomQuote')
-            t_print("\tSuccess")
+            print("\tSuccess")
             comment.save()
 
         if re.search(r"\!bhendicount|bhendicount\!", comment.body, re.I):
-            t_print(f"Replying to '{comment.id}' with bhendi count")
+            print(f"Replying to '{comment.id}' with bhendi count")
             replyToComment(comment, 'bhendiCount')
-            t_print("\tSuccess")
+            print("\tSuccess")
             comment.save()
 
 
@@ -137,16 +146,10 @@ def infinite():
     try:
         main()
     except RequestException as e:
-        t_print(e)
+        print(e)
         time.sleep(300)
         infinite()
 
 
-def t_print(a):
-    # print current time in string format always in IST
-    print(time.ctime(time.mktime(time.gmtime()) + 19800) + ': ' + a)
-
-
-t_print("Starting the bot")
-reddit = None
-infinite()
+print("Starting the bot")
+print(randomQuote())
