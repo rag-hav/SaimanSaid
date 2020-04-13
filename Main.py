@@ -116,7 +116,7 @@ def replyToComment(comment, replyWith):
 
 def main():
 
-    SaimanSays = reddit.subreddit("SaimanSaid")
+    SaimanSays = reddit.subreddit("SaimanSays")
     me = reddit.user.me()
 
     for comment in SaimanSays.stream.comments():
