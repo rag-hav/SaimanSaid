@@ -41,7 +41,7 @@ def randomQuote(sourceComment=None):
     # Filters
     if len(re.sub(r'\s', '', quoteText)) == 0:
         return randomQuote()
-    if re.search('t-series|pewdiepie|video|^welcome', quoteText, re.I):
+    if random.int(0,3) and re.search('t-series|pewdiepie|video|^welcome', quoteText, re.I):
         return randomQuote()
     if re.search(r'(\d\d):(\d\d):(\d\d)', quoteText):
         print(f"Invalid format of {quote=} in {subFile=}")
@@ -108,6 +108,7 @@ def replyToComment(comment, replyWith):
 
     except praw.exceptions.APIException as e:
         if e.field == 'ratelimit':
+            print("Ratelimit Sleeping for 60s")
             time.sleep(60)
             replyToComment(comment, replyWith)
         else:
@@ -126,7 +127,7 @@ def main():
             continue
 
         if re.match(
-            r"^(\bshut ?up\b|\bchup( bot)?( bhendi)?\b)$",
+            r"chup|shut ?up|block",
             comment.body,
                 re.I) and comment.parent().author == me:
             print(f"Replying to '{comment.id}' with shutupSaiman")
@@ -170,6 +171,8 @@ reddit = praw.Reddit(
     username=os.environ.get("SaimanSaid_USERNAME"),
     password=os.environ.get("SaimanSaid_PASSWORD"))
 
+print('\n'*9,shutupSaiman())
 if __name__ == "__main__":
+    hsj
     print("Starting the bot")
     infinite()
