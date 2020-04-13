@@ -12,7 +12,8 @@ def urlQuote(a):
     return quote(a, safe='')
 
 
-def randomQuote():
+def randomQuote(sourceComment=None):
+    # The argument is only for convenince in replyComment
     subFile = random.choice(["subs/" +
                              a for a in os.listdir("subs/")] +
                             ["subs/done/" +
@@ -92,55 +93,64 @@ def bhendiCount(sourceComment):
         return f'Sorry comrade. I did not find any username in your request. You can call me properly by:  \n>BhendiCount! u/{sourceComment.author.name}' + footer
 
 
-def replyToComment(comment, content):
+def shutupSaiman(sourceComment=None):
+    return "It looks like I have annoyed you with my random quotes. So:" + "  \n\n&nbsp;\n\nI am sorry. I am soory." + \
+        "  \n\n&nbsp;\n\n[Quote Sauce](<https://youtu.be/wQ2zsMyOMWc/?t=00h07m55s>)" + \
+        "  \n***\n^P.S. ^You ^can ^simply ^[block&nbsp;me](https://new.reddit.com/settings/messaging) ^to ^hide ^all ^my ^comments ^from ^you  \n\n" + \
+        "^^[PM my creator](<https://www.reddit.com/message/compose/?to=I_eat_I_repeat&subject=Complaint%20SaimanSaid>) for any<>^^complaints.".replace(' ', '&nbsp;').replace('<>', ' ')
+
+
+def replyToComment(comment, replyWith):
     '''Wrapper to handle API limit exception'''
 
     try:
-        if content == 'randomQuote':
-            comment.reply(randomQuote())
-
-        elif content == 'bhendiCount':
-            comment.reply(bhendiCount(comment))
-
-        else:
-            raise Exception()
+        comment.reply(replyWith(comment))
 
     except praw.exceptions.APIException as e:
         if e.field == 'ratelimit':
             time.sleep(60)
-            replyToComment(comment, content)
+            replyToComment(comment, replyWith)
         else:
             raise e
 
 
 def main():
-    reddit = praw.Reddit(
-        client_id=os.environ.get("SaimanSaid_CLIENT_ID"),
-        client_secret=os.environ.get("SaimanSaid_CLIENT_SECRET"),
-        user_agent=os.environ.get("SaimanSaid_USER_AGENT"),
-        username=os.environ.get("SaimanSaid_USERNAME"),
-        password=os.environ.get("SaimanSaid_PASSWORD"))
 
-    SaimanSays = reddit.subreddit("SaimanSays")
+    SaimanSays = reddit.subreddit("SaimanSaid")
     me = reddit.user.me()
 
     for comment in SaimanSays.stream.comments():
         if comment.saved or comment.author == me:
             continue
+        if re.search(r"\brepost\b", comment.body, re.I):
+            continue
+
+        if re.match(
+            r"^(\bshut ?up\b|\bchup( bot)?( bhendi)?\b)$",
+            comment.body,
+                re.I) and comment.parent().author == me:
+            print(f"Replying to '{comment.id}' with shutupSaiman")
+            replyToComment(comment, shutupSaiman)
+            print("\tSuccess")
+            comment.save()
+            continue
+
         if re.search(
             r"\bSaiman\b|\bBhendi\b|\bSaimanSaid\b",
             comment.body,
                 re.I):
             print(f"Replying to '{comment.id}' with random quote")
-            replyToComment(comment, 'randomQuote')
+            replyToComment(comment, randomQuote)
             print("\tSuccess")
             comment.save()
+            continue
 
         if re.search(r"\!bhendicount|bhendicount\!", comment.body, re.I):
             print(f"Replying to '{comment.id}' with bhendi count")
-            replyToComment(comment, 'bhendiCount')
+            replyToComment(comment, bhendiCount)
             print("\tSuccess")
             comment.save()
+            continue
 
 
 def infinite():
@@ -153,5 +163,13 @@ def infinite():
         infinite()
 
 
-print("Starting the bot")
-infinite()
+reddit = praw.Reddit(
+    client_id=os.environ.get("SaimanSaid_CLIENT_ID"),
+    client_secret=os.environ.get("SaimanSaid_CLIENT_SECRET"),
+    user_agent=os.environ.get("SaimanSaid_USER_AGENT"),
+    username=os.environ.get("SaimanSaid_USERNAME"),
+    password=os.environ.get("SaimanSaid_PASSWORD"))
+
+if __name__ == "__main__":
+    print("Starting the bot")
+    infinite()
