@@ -41,7 +41,7 @@ def randomQuote(sourceComment=None):
     # Filters
     if len(re.sub(r'\s', '', quoteText)) == 0:
         return randomQuote()
-    if random.int(0,3) and re.search('t-series|pewdiepie|video|^welcome', quoteText, re.I):
+    if random.randint(0,3) and re.search('t-series|pewdiepie|video|^welcome', quoteText, re.I):
         return randomQuote()
     if re.search(r'(\d\d):(\d\d):(\d\d)', quoteText):
         print(f"Invalid format of {quote=} in {subFile=}")
@@ -171,8 +171,6 @@ reddit = praw.Reddit(
     username=os.environ.get("SaimanSaid_USERNAME"),
     password=os.environ.get("SaimanSaid_PASSWORD"))
 
-print('\n'*9,shutupSaiman())
 if __name__ == "__main__":
-    hsj
     print("Starting the bot")
     infinite()
