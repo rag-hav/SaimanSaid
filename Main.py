@@ -12,7 +12,7 @@ def urlQuote(a):
     return quote(a, safe='')
 
 
-def randomQuote(sourceComment=None):
+def randomQuote():
     # The argument is only for convenince in replyComment
     subFile = random.choice(["subs/" +
                              a for a in os.listdir("subs/")] +
@@ -41,7 +41,7 @@ def randomQuote(sourceComment=None):
     # Filters
     if len(re.sub(r'\s', '', quoteText)) == 0:
         return randomQuote()
-    if random.randint(0,3) and re.search('t-series|pewdiepie|video|^welcome', quoteText, re.I):
+    if random.randint(0,3) and re.search('t-series|pewds|pewdiepie|video|^welcome', quoteText, re.I):
         return randomQuote()
     if re.search(r'(\d\d):(\d\d):(\d\d)', quoteText):
         print(f"Invalid format of {quote=} in {subFile=}")
@@ -53,7 +53,7 @@ def randomQuote(sourceComment=None):
 
     msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
         f'[Quote Sauce](<{youtubeLink}> "Help Me, I am Timothy, Saiman\'s Slave. Please Free me. He is an evil man")  \n' + \
-        f'***\n^^I am a bot,<>^^^that replies to "Bhendi" or "Saiman" with a random quote from Saiman [Know more](https://redd.it/fvkvw9)'.replace(' ', '&nbsp;').replace('<>', ' ')
+        f'***\n^^I am a bot,<>^^^[Know more](https://redd.it/fvkvw9)'.replace(' ', '&nbsp;').replace('<>', ' ')
 
     return msg
 
@@ -64,10 +64,10 @@ def bhendiCount(sourceComment):
     footer = '  ' + footer.replace(' ', '&nbsp;').replace('<_>', ' ')
 
     if targetUserRegex := re.search(
-        r'u/(?P<user>\w+)',
+        r'u/(\w+)',
         sourceComment.body,
             re.I):
-        targetUsername = targetUserRegex.group('user')
+        targetUsername = targetUserRegex.group(1)
         targetRedditor = reddit.redditor(targetUsername)
         try:
             targetRedditor.id
@@ -93,26 +93,22 @@ def bhendiCount(sourceComment):
         return f'Sorry comrade. I did not find any username in your request. You can call me properly by:  \n>BhendiCount! u/{sourceComment.author.name}' + footer
 
 
-def shutupSaiman(sourceComment=None):
+def shutupSaiman():
     return "It looks like I have annoyed you with my random quotes. So:" + "  \n\n&nbsp;\n\nI am sorry. I am soory." + \
         "  \n\n&nbsp;\n\n[Quote Sauce](<https://youtu.be/wQ2zsMyOMWc/?t=00h07m55s>)" + \
         "  \n***\n^P.S. ^You ^can ^simply ^[block&nbsp;me](https://new.reddit.com/settings/messaging) ^to ^hide ^all ^my ^comments ^from ^you  \n\n" + \
         "^^[PM my creator](<https://www.reddit.com/message/compose/?to=I_eat_I_repeat&subject=Complaint%20SaimanSaid>) for any<>^^complaints.".replace(' ', '&nbsp;').replace('<>', ' ')
 
 
-def replyToComment(comment, replyWith):
+def replyToComment(comment, replyTxt):
     '''Wrapper to handle API limit exception'''
 
     try:
-        comment.reply(replyWith(comment))
+        comment.reply(replyTxt)
 
-    except praw.exceptions.APIException as e:
-        if e.field == 'ratelimit':
-            print("Ratelimit Sleeping for 60s")
-            time.sleep(60)
-            replyToComment(comment, replyWith)
-        else:
-            raise e
+    except praw.exceptions.APIException:
+        time.sleep(5)
+        replyToComment(comment, replyTxt)
 
 
 def main():
@@ -123,7 +119,7 @@ def main():
     for comment in SaimanSays.stream.comments():
         if comment.saved or comment.author == me:
             continue
-        if re.search(r"\brepost\b", comment.body, re.I):
+        if re.search(r"\bre+post\b", comment.body, re.I):
             continue
 
         if re.match(
@@ -131,37 +127,27 @@ def main():
             comment.body,
                 re.I) and comment.parent().author == me:
             print(f"Replying to '{comment.id}' with shutupSaiman")
-            replyToComment(comment, shutupSaiman)
+            replyToComment(comment, shutupSaiman())
             print("\tSuccess")
             comment.save()
             continue
 
         if re.search(
-            r"\bSaiman\b|\bBhendi\b|\bSaimanSaid\b",
+            r"\bSaiman\b|\bBhe+ndi\b|\bSaiman-?Said\b",
             comment.body,
                 re.I):
             print(f"Replying to '{comment.id}' with random quote")
-            replyToComment(comment, randomQuote)
+            replyToComment(comment, randomQuote())
             print("\tSuccess")
             comment.save()
             continue
 
-        if re.search(r"\!bhendicount|bhendicount\!", comment.body, re.I):
+        if re.search(r"bhendicount", comment.body, re.I):
             print(f"Replying to '{comment.id}' with bhendi count")
-            replyToComment(comment, bhendiCount)
+            replyToComment(comment, bhendiCount(comment))
             print("\tSuccess")
             comment.save()
             continue
-
-
-def infinite():
-    '''Ensures that the bot can survive server down'''
-    try:
-        main()
-    except RequestException as e:
-        print(e)
-        time.sleep(300)
-        infinite()
 
 
 reddit = praw.Reddit(
@@ -173,4 +159,14 @@ reddit = praw.Reddit(
 
 if __name__ == "__main__":
     print("Starting the bot")
-    infinite()
+    while(True):
+        try:
+            main()
+        #Network Issues
+        except (RequestException, ServerError) as e:
+            print(e)
+            time.sleep(60)
+        except KeyboardInterrupt:
+            print("Killing all operations; Over and Out")
+            break
+
