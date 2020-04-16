@@ -34,9 +34,11 @@ def randomQuote():
 
     # Removes the time stamp
     quoteText = re.sub("^.*\n", '', quote)
+    quoteText = re.sub("[\[\(].*[\]\)]",'',quoteText)
+    quoteText = re.sub("  ",' ',quoteText)
 
     # Filters
-    if len(re.sub(r'\s', '', quoteText)) == 0:
+    if len(re.sub(r'\s', '', quoteText)) < 2:
         return randomQuote()
     if random.randint(0,3) and re.search('t-series|pewds|pewdiepie|video|^welcome', quoteText, re.I):
         return randomQuote()
