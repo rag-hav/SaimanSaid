@@ -47,12 +47,13 @@ def randomQuote():
         return randomQuote()
 
     # Formatting
-    quoteText = re.sub(r"^ ?(and|but)", '', quoteText, flags=re.I)
+    quoteText = re.sub(r"^ ?(and|but|so|also)", '', quoteText, flags=re.I).strip()
+    quoteText = re.sub(r"^\W+", '', quoteText, flags=re.I).strip()
     quoteText = quoteText.capitalize()
 
     msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
         f'[Quote Sauce](<{youtubeLink}> "Help Me, I am Timothy, Saiman\'s Slave. Please Free me. He is an evil man")  \n' + \
-        f'***\n^^I am a bot,<>^^^[Know more](https://redd.it/fvkvw9)'.replace(' ', '&nbsp;').replace('<>', ' ')
+        f'***\n^^I am a bot, that replies to Bhendi or Saimain<>^^^[Know more](https://redd.it/fvkvw9)'.replace(' ', '&nbsp;').replace('<>', ' ')
 
     return msg
 

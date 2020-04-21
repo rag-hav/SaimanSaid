@@ -63,4 +63,7 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             print("Killing all operations; Over and Out")
             break
+        else:
+            raise "Program Finished! Hint: It shouldn't"
+            break
 
