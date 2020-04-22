@@ -34,8 +34,16 @@ def randomQuote():
 
     # Removes the time stamp
     quoteText = re.sub("^.*\n", '', quote)
+    # Removes anything inside [] or ()
     quoteText = re.sub("[\[\(].*[\]\)]",'',quoteText)
     quoteText = re.sub("  ",' ',quoteText)
+
+
+    # Formatting
+    quoteText = re.sub(r"^ ?(and|but|so|also)", '', quoteText, flags=re.I).strip()
+    quoteText = re.sub(r"^\W+", '', quoteText, flags=re.I).strip()
+    quoteText = quoteText.capitalize()
+
 
     # Filters
     if len(re.sub(r'\s', '', quoteText)) < 2:
@@ -46,10 +54,6 @@ def randomQuote():
         print(f"Invalid format of {quote=} in {subFile=}")
         return randomQuote()
 
-    # Formatting
-    quoteText = re.sub(r"^ ?(and|but|so|also)", '', quoteText, flags=re.I).strip()
-    quoteText = re.sub(r"^\W+", '', quoteText, flags=re.I).strip()
-    quoteText = quoteText.capitalize()
 
     msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
         f'[Quote Sauce](<{youtubeLink}> "Help Me, I am Timothy, Saiman\'s Slave. Please Free me. He is an evil man")  \n' + \
