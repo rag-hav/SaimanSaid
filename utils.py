@@ -57,7 +57,7 @@ def randomQuote():
 
     msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
         f'[Quote Sauce](<{youtubeLink}> "Help Me, I am Timothy, Saiman\'s Slave. Please Free me. He is an evil man")  \n' + \
-        f'***\n^^I am a bot, that replies to Bhendi or Saimain<>^^^[Know more](https://redd.it/fvkvw9)'.replace(' ', '&nbsp;').replace('<>', ' ')
+        f'***\n^^I am a bot, that replies to Bhendi or Saiman<>^^^[Know more](https://redd.it/fvkvw9)'.replace(' ', '&nbsp;').replace('<>', ' ')
 
     return msg
 
