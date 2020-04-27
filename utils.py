@@ -10,7 +10,7 @@ def urlQuote(a):
 
 
 def randomQuote():
-    # The argument is only for convenince in replyComment
+    # subtitle files in done folder have 3 times the chances of getting picked
     subFile = random.choice(["subs/" +
                              a for a in os.listdir("subs/")] +
                             ["subs/done/" +
@@ -38,26 +38,29 @@ def randomQuote():
     quoteText = re.sub("[\[\(].*[\]\)]",'',quoteText)
     quoteText = re.sub("  ",' ',quoteText)
 
+    #sometimes two quotes are not seperated
+    if re.search(r'(\d\d):(\d\d):(\d\d)', quoteText):
+        print(f"Invalid format of {quote=} in {subFile=}")
+        return randomQuote()
 
     # Formatting
-    quoteText = re.sub(r"^ ?(and|but|so|also)", '', quoteText, flags=re.I).strip()
-    quoteText = re.sub(r"^\W+", '', quoteText, flags=re.I).strip()
+    quoteText = re.sub(r"^ ?(and|but|so|also)\W*", '', quoteText, flags=re.I).strip()
     quoteText = quoteText.capitalize()
 
 
     # Filters
     if len(re.sub(r'\s', '', quoteText)) < 2:
         return randomQuote()
-    if random.randint(0,3) and re.search('t-series|pewds|pewdiepie|video|^welcome', quoteText, re.I):
+    if re.search('video|^welcome', quoteText, re.I):
         return randomQuote()
-    if re.search(r'(\d\d):(\d\d):(\d\d)', quoteText):
-        print(f"Invalid format of {quote=} in {subFile=}")
+    # one fourth chance of allowing quote with these keywords
+    if not random.randint(0,3) and re.search('t-series|pewds|pewdiepie', quoteText, re.I):
         return randomQuote()
 
 
     msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
         f'[Quote Sauce](<{youtubeLink}> "Help Me, I am Timothy, Saiman\'s Slave. Please Free me. He is an evil man")  \n' + \
-        f'***\n^^I am a bot, that replies to Bhendi or Saiman<>^^^[Know more](https://redd.it/fvkvw9)'.replace(' ', '&nbsp;').replace('<>', ' ')
+        f'***\n^^I am Timothy. I reply to Bhendi or Saiman<>^^^[Know more](https://redd.it/fvkvw9)'.replace(' ', '&nbsp;').replace('<>', ' ')
 
     return msg
 
