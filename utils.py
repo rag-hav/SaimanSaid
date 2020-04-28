@@ -10,12 +10,12 @@ def urlQuote(a):
 
 
 def randomQuote():
-    # subtitle files in done folder have 3 times the chances of getting picked
+    # subtitle files in done folder have 2 times the chances of getting picked
     subFile = random.choice(["subs/" +
                              a for a in os.listdir("subs/")] +
                             ["subs/done/" +
                              a for a in os.listdir("subs/done/")] *
-                            3)
+                            2)
     if subFile == 'subs/done':
         return randomQuote()
     with open(subFile, 'r') as subFile_:
