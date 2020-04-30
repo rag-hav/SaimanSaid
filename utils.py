@@ -12,7 +12,7 @@ def urlQuote(a):
 
 
 def quoteCreator():
-    allQuotes = []
+    doneQuotes, subQuotes = [], []
     subFiles = [
         "subs/" + a for a in os.listdir("subs/")] + [
         "subs/done/" + a for a in os.listdir("subs/done/")]
@@ -29,7 +29,7 @@ def quoteCreator():
                 print(f"Time stamp not found in {quote=} \nof {subFile=}")
                 continue
 
-            videoId = os.path.basename(subFile)
+            videoId = os.path.basename(subFile)[3:]
             youtubeLink = f"https://youtu.be/{videoId}/?t={hh}h{mm}m{ss}s"
 
             # Removes the time stamp
@@ -58,24 +58,37 @@ def quoteCreator():
                 #print(f"Banned words in '{quoteText}' of {subFile}")
                 continue
 
-            allQuotes.append((quoteText, youtubeLink))
             if 'done' in subFile:
-                allQuotes.append((quoteText, youtubeLink))
-    return allQuotes
+                doneQuotes.append((quoteText, youtubeLink))
+            else:
+                subQuotes.append((quoteText, youtubeLink))
+
+    return doneQuotes, subQuotes
 
 
-allQuotes = quoteCreator()
+doneQuotes, subQuotes = quoteCreator()
+
+
+def updateKnowmore(reddit):
+    Knowmore = reddit.submission("fvkvw9")
+    srch = r"Currently, the bot has (\d+) filtered quotes and (\d+) unfiltered quotes in its database"
+    oldDoneNum, oldSubNum = re.search(srch, Knowmore.selftext).groups()
+    if oldDoneNum != len(doneQuotes) or oldSubNum != len(subQuotes):
+        newBody = re.sub(
+            srch,
+            f"Currently, the bot has {len(doneQuotes)} filtered quotes and {len(subQuotes)} unfiltered quotes in its database",
+            Knowmore.selftext)
+        Knowmore.edit(newBody)
+        print(
+            f"Knowmore Updated: {len(doneQuotes)} done quotes and {len(subQuotes)} sub quotes")
 
 
 def randomQuote():
-    quoteText, youtubeLink = random.choice(allQuotes)
+    quoteText, youtubeLink = random.choice(subQuotes + doneQuotes * 2)
 
-    if not random.randint(
-        0,
-        3) and re.search(
+    if not random.randint(0,3) and re.search(
         't-series|pewds|pewdiepie',
-        quoteText,
-            re.I):
+        quoteText, re.I):
         return randomQuote()
 
     msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
