@@ -54,7 +54,6 @@ reddit = praw.Reddit(
 if __name__ == "__main__":
     print("Starting the bot")
     updateKnowmore(reddit)
-    input()
     while(True):
         try:
             main()
