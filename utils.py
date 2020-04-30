@@ -73,7 +73,8 @@ def updateKnowmore(reddit):
     Knowmore = reddit.submission("fvkvw9")
     srch = r"Currently, the bot has (\d+) filtered quotes and (\d+) unfiltered quotes in its database"
     oldDoneNum, oldSubNum = re.search(srch, Knowmore.selftext).groups()
-    if oldDoneNum != len(doneQuotes) or oldSubNum != len(subQuotes):
+
+    if int(oldDoneNum) != len(doneQuotes) or int(oldSubNum) != len(subQuotes):
         newBody = re.sub(
             srch,
             f"Currently, the bot has {len(doneQuotes)} filtered quotes and {len(subQuotes)} unfiltered quotes in its database",
