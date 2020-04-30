@@ -53,10 +53,12 @@ reddit = praw.Reddit(
 
 if __name__ == "__main__":
     print("Starting the bot")
+    updateKnowmore(reddit)
+    input()
     while(True):
         try:
             main()
-        #Network Issues
+        # Network Issues
         except (RequestException, ServerError) as e:
             print(e)
             time.sleep(60)
@@ -66,4 +68,3 @@ if __name__ == "__main__":
         else:
             raise "Program Finished! Hint: It shouldn't"
             break
-
