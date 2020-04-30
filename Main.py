@@ -27,7 +27,7 @@ def main():
             continue
 
         if re.search(
-            r"\bSaiman\b|\bBhe+ndi\b|\bSaiman-?Said\b|Sai ?-?bot",
+            r"\bSaiman\b|\bBhe+ndi\b|\bSaiman-?Said\b|\bSai ?-?bot\b",
             comment.body,
                 re.I):
             print(f"Replying to '{comment.id}' with random quote")

@@ -1,62 +1,82 @@
 from urllib.parse import quote
+from pprint import pprint
 from praw.exceptions import APIException
 import os
 import re
 import random
 import time
 
+
 def urlQuote(a):
     return quote(a, safe='')
 
 
+def quoteCreator():
+    allQuotes = []
+    subFiles = [
+        "subs/" + a for a in os.listdir("subs/")] + [
+        "subs/done/" + a for a in os.listdir("subs/done/")]
+
+    for subFile in subFiles:
+        if subFile == 'subs/done':
+            continue
+        quotes = open(subFile, 'r').read().split('\n\n')
+        for quote in quotes:
+            if quoteTime := re.match(r"(\d\d):(\d\d):(\d\d)", quote):
+                hh, mm, ss = quoteTime.groups()
+            else:
+
+                print(f"Time stamp not found in {quote=} \nof {subFile=}")
+                continue
+
+            videoId = os.path.basename(subFile)
+            youtubeLink = f"https://youtu.be/{videoId}/?t={hh}h{mm}m{ss}s"
+
+            # Removes the time stamp
+            quoteText = re.sub("^.*\n", '', quote)
+            # Removes anything inside [] or ()
+            quoteText = re.sub(r"[\[\(].*[\]\)]", '', quoteText)
+            quoteText = re.sub("  ", ' ', quoteText)
+
+            # sometimes two quotes are not seperated
+            if re.search(r'(\d\d):(\d\d):(\d\d)', quoteText):
+                print(f"Invalid format of {quote=} in {subFile=}")
+                continue
+
+            # Formatting
+            quoteText = re.sub(
+                r"^ ?(and|but|so|also)\W*",
+                '',
+                quoteText,
+                flags=re.I).strip()
+            quoteText = quoteText.capitalize()
+
+            # Filters
+            if len(re.sub(r'\s', '', quoteText)) < 2:
+                continue
+            if re.search('video|^welcome', quoteText, re.I):
+                #print(f"Banned words in '{quoteText}' of {subFile}")
+                continue
+
+            allQuotes.append((quoteText, youtubeLink))
+            if 'done' in subFile:
+                allQuotes.append((quoteText, youtubeLink))
+    return allQuotes
+
+
+allQuotes = quoteCreator()
+
+
 def randomQuote():
-    # subtitle files in done folder have 2 times the chances of getting picked
-    subFile = random.choice(["subs/" +
-                             a for a in os.listdir("subs/")] +
-                            ["subs/done/" +
-                             a for a in os.listdir("subs/done/")] *
-                            2)
-    if subFile == 'subs/done':
+    quoteText, youtubeLink = random.choice(allQuotes)
+
+    if not random.randint(
+        0,
+        3) and re.search(
+        't-series|pewds|pewdiepie',
+        quoteText,
+            re.I):
         return randomQuote()
-    with open(subFile, 'r') as subFile_:
-        quotes = subFile_.read()
-
-    quote = random.choice(quotes.split('\n\n'))
-
-    if quoteTime := re.match(r"(\d\d):(\d\d):(\d\d)", quote):
-        hh, mm, ss = quoteTime.groups()
-    else:
-        print(f"Time stamp not found in {quote=} \nof {subFile=}")
-        return randomQuote()
-
-    videoId = os.path.basename(subFile)
-    youtubeLink = f"https://youtu.be/{videoId}/?t={hh}h{mm}m{ss}s"
-
-    # Removes the time stamp
-    quoteText = re.sub("^.*\n", '', quote)
-    # Removes anything inside [] or ()
-    quoteText = re.sub("[\[\(].*[\]\)]",'',quoteText)
-    quoteText = re.sub("  ",' ',quoteText)
-
-    #sometimes two quotes are not seperated
-    if re.search(r'(\d\d):(\d\d):(\d\d)', quoteText):
-        print(f"Invalid format of {quote=} in {subFile=}")
-        return randomQuote()
-
-    # Formatting
-    quoteText = re.sub(r"^ ?(and|but|so|also)\W*", '', quoteText, flags=re.I).strip()
-    quoteText = quoteText.capitalize()
-
-
-    # Filters
-    if len(re.sub(r'\s', '', quoteText)) < 2:
-        return randomQuote()
-    if re.search('video|^welcome', quoteText, re.I):
-        return randomQuote()
-    # one fourth chance of allowing quote with these keywords
-    if not random.randint(0,3) and re.search('t-series|pewds|pewdiepie', quoteText, re.I):
-        return randomQuote()
-
 
     msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
         f'[Quote Sauce](<{youtubeLink}> "Help Me, I am Timothy, Saiman\'s Slave. Please Free me. He is an evil man")  \n' + \
@@ -116,6 +136,3 @@ def replyToComment(comment, replyTxt):
     except APIException:
         time.sleep(5)
         replyToComment(comment, replyTxt)
-
-
-
