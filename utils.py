@@ -11,6 +11,14 @@ def urlQuote(a):
     return quote(a, safe='')
 
 
+def commentCheck(reddit):
+    for comment in reddit.user.me().comments.new():
+        if comment.score < -5:
+            comment.delete()
+            reddit.redditor("I_eat_I_repeat").message("Comment deleted",comment.body + '\n'+comment.permalink)
+            print("Deleted comment {comment.permalink}")
+
+
 def quoteCreator():
     doneQuotes, subQuotes = [], []
     subFiles = [
@@ -147,6 +155,8 @@ def replyToComment(comment, replyTxt):
     try:
         comment.reply(replyTxt)
 
-    except APIException:
-        time.sleep(5)
-        replyToComment(comment, replyTxt)
+    except RedditAPIException as exception:
+        for subexception in exception.items:
+            print(subexception.error_type)
+            time.sleep(5)
+            replyToComment(comment, replyTxt)

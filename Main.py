@@ -7,10 +7,12 @@ from utils import *
 
 def main():
 
+    lastCommentCheckTime = 0
     SaimanSays = reddit.subreddit("SaimanSays")
     me = reddit.user.me()
 
     for comment in SaimanSays.stream.comments():
+
         if comment.saved or comment.author == me:
             continue
         if re.search(r"\bre+post\b", comment.body, re.I):
@@ -43,6 +45,9 @@ def main():
             comment.save()
             continue
 
+        if time.time() - lastCommentCheckTime > 3600:
+            commentCheck(reddit)
+            lastCommentCheckTime = time.time()
 
 reddit = praw.Reddit(
     client_id=os.environ.get("SaimanSaid_CLIENT_ID"),
@@ -65,5 +70,5 @@ if __name__ == "__main__":
             print("Killing all operations; Over and Out")
             break
         else:
-            raise "Program Finished! Hint: It shouldn't"
+            raise "Program Finished, It really shouldn't"
             break
