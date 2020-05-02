@@ -13,9 +13,9 @@ def urlQuote(a):
 
 def commentCheck(reddit):
     for comment in reddit.user.me().comments.new():
-        if comment.score < -5:
+        if comment.score < -3:
             comment.delete()
-            reddit.redditor("I_eat_I_repeat").message("Comment deleted",comment.body + '\n'+comment.permalink)
+            reddit.redditor("I_eat_I_repeat").message("Comment deleted",comment.body + '\n\n'+comment.parent().permalink.replace("reddit","removeddit"))
             print("Deleted comment {comment.permalink}")
 
 

@@ -45,7 +45,7 @@ def main():
             comment.save()
             continue
 
-        if time.time() - lastCommentCheckTime > 3600:
+        if time.time() - lastCommentCheckTime > 1800:
             commentCheck(reddit)
             lastCommentCheckTime = time.time()
 
