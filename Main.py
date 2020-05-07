@@ -26,7 +26,7 @@ def main():
             comment.save()
             continue
 
-        elif re.match(r"^lol xd m[ae]in kaise maa?n lu\??$", 
+        elif re.match(r"^(lol )?(xd )?m[ae]in kaise maa?n lu\??$", 
                 comment.body, re.I):
             print(f"Replying to '{comment.id}' with mat mann")
             replyToComment(comment, "matt maan")
