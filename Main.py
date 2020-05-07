@@ -13,14 +13,12 @@ def main():
 
     for comment in SaimanSays.stream.comments():
 
-        if comment.saved or comment.author == me:
-            continue
-        if re.search(r"\bre+post\b", comment.body, re.I):
+        if comment.saved \
+                or comment.author == me \
+                or re.search(r"\bre+post\b", comment.body, re.I):
             continue
 
-        if re.match(
-            r"chup|shut ?up|block",
-            comment.body,
+        if re.match(r"chup|shut ?up|block", comment.body, 
                 re.I) and comment.parent().author == me:
             print(f"Replying to '{comment.id}' with shutupSaiman")
             replyToComment(comment, shutupSaiman())
@@ -28,7 +26,14 @@ def main():
             comment.save()
             continue
 
-        if re.search(
+        elif re.match(r"^lol xd m[ae]in kaise maa?n lu\??$", 
+                comment.body, re.I):
+            print(f"Replying to '{comment.id}' with mat mann")
+            replyToComment(comment, "matt maan")
+            print("\tSuccess")
+            comment.save()
+
+        elif re.search(
             r"\bSaiman\b|\bBhe+ndi\b|\bSaiman-?Said\b|\bSai ?-?bot\b",
             comment.body,
                 re.I):
@@ -38,7 +43,7 @@ def main():
             comment.save()
             continue
 
-        if re.search(r"bhendicount", comment.body, re.I):
+        elif re.search(r"bhendicount", comment.body, re.I):
             print(f"Replying to '{comment.id}' with bhendi count")
             replyToComment(comment, bhendiCount(comment))
             print("\tSuccess")
@@ -48,6 +53,7 @@ def main():
         if time.time() - lastCommentCheckTime > 1800:
             commentCheck(reddit)
             lastCommentCheckTime = time.time()
+
 
 reddit = praw.Reddit(
     client_id=os.environ.get("SaimanSaid_CLIENT_ID"),

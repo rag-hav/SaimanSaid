@@ -15,7 +15,13 @@ def commentCheck(reddit):
     for comment in reddit.user.me().comments.new():
         if comment.score < -3:
             comment.delete()
-            reddit.redditor("I_eat_I_repeat").message("Comment deleted",comment.body + '\n\n'+comment.parent().permalink.replace("reddit","removeddit"))
+            reddit.redditor("I_eat_I_repeat").message(
+                "Comment deleted",
+                comment.body +
+                '\n\n' +
+                comment.parent().permalink.replace(
+                    "reddit",
+                    "removeddit"))
             print("Deleted comment {comment.permalink}")
 
 
@@ -95,9 +101,9 @@ def updateKnowmore(reddit):
 def randomQuote():
     quoteText, youtubeLink = random.choice(subQuotes + doneQuotes * 2)
 
-    if not random.randint(0,3) and re.search(
+    if not random.randint(0, 3) and re.search(
         't-series|pewds|pewdiepie',
-        quoteText, re.I):
+            quoteText, re.I):
         return randomQuote()
 
     msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
