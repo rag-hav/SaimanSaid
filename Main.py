@@ -26,7 +26,7 @@ def main():
             comment.save()
             continue
 
-        elif re.match(r"^(lol )?(xd )?m[ae]in? k(ai|e)se maa?n lu\?+$",
+        elif re.match(r"^(lol )?(xd )?m[ae]in? k(ai|e)se maa?n lu\?*$",
                       comment.body, re.I):
             comment.refresh()
             for reply in comment.replies:
@@ -34,8 +34,7 @@ def main():
                     break
             else:
                 print(f"Replying to '{comment.id}' with mat mann")
-                replyToComment(comment, 
-                        "matt maan  \n\n***\n^^^(I am dddisco dancerr tu tu tudu)")
+                replyToComment(comment,matMaan()) 
                 print("\tSuccess")
                 comment.save()
 
@@ -73,7 +72,8 @@ if __name__ == "__main__":
     updateKnowmore(reddit)
     while(True):
         try:
-            main()
+            #main()
+            break
         # Network Issues
         except (RequestException, ServerError) as e:
             print(e)
