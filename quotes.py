@@ -29,7 +29,7 @@ def randomQuote():
         f'[Quote Sauce](<{youtubeLink}> "Help Me, I am Timothy, Saiman\'s ' \
         'Slave. Please Free me. He is an evil man")  \n' + \
         f'***\n^^I am Timothy. I reply to Bhendi, Saiman or Saibot'.replace(
-            ' ', '&nbsp;')
+            ' ', '&nbsp;') + \
     ' ^^^[Know&nbsp;more](https://redd.it/fvkvw9)'
 
     return msg
