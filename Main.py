@@ -18,20 +18,26 @@ def main():
                 or re.search(r"\bre+post\b", comment.body, re.I):
             continue
 
-        if re.match(r"chup|shut ?up|block", comment.body, 
-                re.I) and comment.parent().author == me:
+        if re.match(r"chup|shut ?up|block", comment.body,
+                    re.I) and comment.parent().author == me:
             print(f"Replying to '{comment.id}' with shutupSaiman")
             replyToComment(comment, shutupSaiman())
             print("\tSuccess")
             comment.save()
             continue
 
-        elif re.match(r"^(lol )?(xd )?m[ae]in kaise maa?n lu\??$", 
-                comment.body, re.I):
-            print(f"Replying to '{comment.id}' with mat mann")
-            replyToComment(comment, "matt maan")
-            print("\tSuccess")
-            comment.save()
+        elif re.match(r"^(lol )?(xd )?m[ae]in? k(ai|e)se maa?n lu\?+$",
+                      comment.body, re.I):
+            comment.refresh()
+            for reply in comment.replies:
+                if re.search(r"mat+ ma+n+", reply.body, re.I):
+                    break
+            else:
+                print(f"Replying to '{comment.id}' with mat mann")
+                replyToComment(comment, 
+                        "matt maan  \n\n***\n^^^(I am dddisco dancerr tu tu tudu)")
+                print("\tSuccess")
+                comment.save()
 
         elif re.search(
             r"\bSaiman\b|\bBhe+ndi\b|\bSaiman-?Said\b|\bSai ?-?bot\b",
