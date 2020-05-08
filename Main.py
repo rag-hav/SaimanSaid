@@ -3,8 +3,19 @@ import praw
 from prawcore.exceptions import RequestException, ServerError
 import re
 import time
-from utils import *
-
+from utils import (
+    cakedayCheck,
+    myCommentCheck,
+    updateKnowmore,
+    replyToComment,
+)
+from quotes import (
+    happyCakeday,
+    matMaan,
+    randomQuote,
+    bhendiCount,
+    shutupSaiman,
+)
 def main():
 
     lastCommentCheckTime = 0
@@ -13,13 +24,17 @@ def main():
 
     for comment in SaimanSays.stream.comments():
 
+        if time.time() - lastCommentCheckTime > 1800:
+            myCommentCheck(reddit)
+            lastCommentCheckTime = time.time()
+
         if comment.saved \
                 or comment.author == me \
                 or re.search(r"\bre+post\b", comment.body, re.I):
             continue
 
         if re.search(r"chup|shut ?up|block", comment.body,
-                    re.I) and comment.parent().author == me:
+                     re.I) and comment.parent().author == me:
             print(f"Replying to '{comment.id}' with shutupSaiman")
             replyToComment(comment, shutupSaiman())
             print("\tSuccess")
@@ -37,9 +52,15 @@ def main():
                 print("\tSuccess")
                 comment.save()
 
+        elif cakedayCheck(comment):
+            print(f"Replying to '{comment.id}' with Cakeday")
+            replyToComment(comment, happyCakeday())
+            print("\tSuccess")
+            comment.save()
+
         elif re.search(
             r"\bSaiman\b|\bBhe+ndi\b|\bSaiman-?Said\b|\bSai ?-?bot\b",
-            comment.body, re.I):
+                comment.body, re.I):
             print(f"Replying to '{comment.id}' with random quote")
             replyToComment(comment, randomQuote())
             print("\tSuccess")
@@ -50,10 +71,6 @@ def main():
             replyToComment(comment, bhendiCount(comment))
             print("\tSuccess")
             comment.save()
-
-        if time.time() - lastCommentCheckTime > 1800:
-            commentCheck(reddit)
-            lastCommentCheckTime = time.time()
 
 
 reddit = praw.Reddit(
