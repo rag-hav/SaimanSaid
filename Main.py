@@ -18,15 +18,14 @@ def main():
                 or re.search(r"\bre+post\b", comment.body, re.I):
             continue
 
-        if re.match(r"chup|shut ?up|block", comment.body,
+        if re.search(r"chup|shut ?up|block", comment.body,
                     re.I) and comment.parent().author == me:
             print(f"Replying to '{comment.id}' with shutupSaiman")
             replyToComment(comment, shutupSaiman())
             print("\tSuccess")
             comment.save()
-            continue
 
-        elif re.match(r"^(lol )?(xd )?m[ae]in? k(ai|e)se maa?n lu\?*$",
+        elif re.match(r"(lol )?(xd )?m[ae]in? k(ai|e)se maa?n lu\?*",
                       comment.body, re.I):
             comment.refresh()
             for reply in comment.replies:
@@ -40,20 +39,17 @@ def main():
 
         elif re.search(
             r"\bSaiman\b|\bBhe+ndi\b|\bSaiman-?Said\b|\bSai ?-?bot\b",
-            comment.body,
-                re.I):
+            comment.body, re.I):
             print(f"Replying to '{comment.id}' with random quote")
             replyToComment(comment, randomQuote())
             print("\tSuccess")
             comment.save()
-            continue
 
         elif re.search(r"bhendicount", comment.body, re.I):
             print(f"Replying to '{comment.id}' with bhendi count")
             replyToComment(comment, bhendiCount(comment))
             print("\tSuccess")
             comment.save()
-            continue
 
         if time.time() - lastCommentCheckTime > 1800:
             commentCheck(reddit)

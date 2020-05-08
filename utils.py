@@ -58,8 +58,10 @@ def quoteCreator():
                 continue
 
             # Formatting
+            quoteText=quoteText.strip()
             quoteText = re.sub(
-                r"^ ?(and|but|so|also)\W*",
+                r"^(and|but|so|also)\W*|" + \
+                "([^a-zA-Z\?\.\!]*and|but|so|also)\W*$",
                 '',
                 quoteText,
                 flags=re.I).strip()
