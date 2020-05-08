@@ -85,8 +85,7 @@ if __name__ == "__main__":
     updateKnowmore(reddit)
     while(True):
         try:
-            # main()
-            break
+            main()
         # Network Issues
         except (RequestException, ServerError) as e:
             print(e)
