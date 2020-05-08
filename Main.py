@@ -34,7 +34,7 @@ def main():
                     break
             else:
                 print(f"Replying to '{comment.id}' with mat mann")
-                replyToComment(comment,matMaan()) 
+                replyToComment(comment, matMaan())
                 print("\tSuccess")
                 comment.save()
 
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     updateKnowmore(reddit)
     while(True):
         try:
-            #main()
+            # main()
             break
         # Network Issues
         except (RequestException, ServerError) as e:

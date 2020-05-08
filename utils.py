@@ -97,10 +97,12 @@ def updateKnowmore(reddit):
         print(
             f"Knowmore Updated: {len(doneQuotes)} done quotes and {len(subQuotes)} sub quotes")
 
+
 def matMaan():
-    return "mat maan  \n\n***\n"+
-           "^^(I am dddisco dancerr tu tu)".replace(" ","&nbsp;")+
+    return "mat maan  \n\n***\n" +\
+           "^^(I am dddisco dancerr tu tu)".replace(" ", "&nbsp;") +\
            " ^^tudu"
+
 
 def randomQuote():
     quoteText, youtubeLink = random.choice(subQuotes + doneQuotes * 2)
