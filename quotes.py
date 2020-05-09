@@ -1,7 +1,7 @@
 import re
+import os
 import random
 from urllib.parse import quote
-from utils import doneQuotes, subQuotes
 
 def urlQuote(a): return quote(a, safe='')
 
@@ -30,13 +30,13 @@ def randomQuote():
         'Slave. Please Free me. He is an evil man")  \n' + \
         f'***\n^^I am Timothy. I reply to Bhendi, Saiman or Saibot'.replace(
             ' ', '&nbsp;') + \
-    ' ^^^[Know&nbsp;more](https://redd.it/fvkvw9)'
+        ' ^^^[Know&nbsp;more](https://redd.it/fvkvw9)'
 
     return msg
 
 
 def bhendiCount(sourceComment):
-    footer = "\n\n***\n^^[Report error](<https://www.reddit.com/message/" +\
+    footer = "  \n\n***\n^^[Report error](<https://www.reddit.com/message/" +\
         "compose/?to=I_eat_I_repeat&subject=BhendiCount%20Error&message=" +\
         urlQuote("BhendiCount bot did not work as expected in reply to " +
                  f"comment {sourceComment.permalink}") + \
@@ -48,39 +48,37 @@ def bhendiCount(sourceComment):
         ">) | [Know more](<https://redd.it/fvkvw9>)"
     footer = '  ' + footer.replace(' ', '&nbsp;').replace('<_>', ' ')
 
-    if targetUserRegex := re.search(
-        r'u/(\w+)',
-        sourceComment.body,
-            re.I):
+    if targetUserRegex := re.search(r'u/(\w+)', sourceComment.body, re.I):
         targetUsername = targetUserRegex.group(1)
         targetRedditor = reddit.redditor(targetUsername)
-        try:
-            targetRedditor.id
-        except NotFound:
-            return f"Sorry comrade, it looks like is no u/{targetUsername}" + \
-                footer
-
-        bcount = 0
-        for comment in targetRedditor.comments.new(limit=None):
-            if re.search(r'\bbhendi\b', comment.body, re.I):
-                bcount += 1
-        if bcount > 50:
-            bhendiRank = "  \nHe is a Bhendi Bahgwan"
-        elif bcount > 12:
-            bhendiRank = "  \nHe is a Bhendi Bhashi"
-        elif bcount > 5:
-            bhendiRank = "  \nHe is a Bhendi Master"
-        elif bcount > 0:
-            bhendiRank = "  \nHe is a Bhendi Balak"
-        else:
-            bhendiRank = '  '
-        return f'Thankyou for your request comrade  \n\n&nbsp;\n  '\
-            '\nu/{targetUsername} has said "Bhendi" a total of '\
-            '{bcount} times!' + bhendiRank + footer
     else:
-        return 'Sorry comrade. I did not find any username in your request. '\
-            'You can call me properly by:  \n>BhendiCount! '\
-            f'u/{sourceComment.author.name}' + footer
+        targetRedditor = sourceComment.parent().author
+
+    try:
+        targetRedditor.id
+    except NotFound:
+        return f"I didn't find any u/{targetUsername}" + footer
+
+    bcount = 0
+    for comment in targetRedditor.comments.new(limit=None):
+        if re.search(r'\bbhendi\b', comment.body, re.I):
+            bcount += 1
+
+    bhendiRank = "  \nHe has been awarded the title of "
+    if bcount > 50:
+        bhendiRank += "Bhendi Bahgwan"
+    elif bcount > 12:
+        bhendiRank += "Bhendi Bhashi"
+    elif bcount > 5:
+        bhendiRank += "Bhendi Master"
+    elif bcount > 0:
+        bhendiRank += "Bhendi Balak"
+    else:
+        bhendiRank = ''
+
+    return f'Thankyou for your request comrade  \n\n&nbsp;\n  '\
+        '\nu/{targetUsername} has said "Bhendi" a total of '\
+        '{bcount} times!' + bhendiRank + footer
 
 
 def shutupSaiman():
@@ -94,3 +92,65 @@ def shutupSaiman():
         "^^[PM&nbsp;my&nbsp;creator](<https://www.reddit.com/message/compose/"\
         "?to=I_eat_I_repeat&subject=Complaint%20SaimanSaid>)&nbsp;"\
         "for&nbsp;any ^^complaints."
+
+
+def quoteCreator():
+    doneQuotes, subQuotes = [], []
+    subFiles = [
+        "subs/" + a for a in os.listdir("subs/")] + [
+        "subs/done/" + a for a in os.listdir("subs/done/")]
+
+    for subFile in subFiles:
+        if subFile == 'subs/done':
+            continue
+        quotes = open(subFile, 'r').read().split('\n\n')
+        for quote in quotes:
+            if quoteTime := re.match(r"(\d\d):(\d\d):(\d\d)", quote):
+                hh, mm, ss = quoteTime.groups()
+            else:
+
+                print(f"Time stamp not found in {quote=} \nof {subFile=}")
+                continue
+
+            videoId = os.path.basename(subFile)[3:]
+            youtubeLink = f"https://youtu.be/{videoId}/?t={hh}h{mm}m{ss}s"
+
+            # Removes the time stamp
+            quoteText = re.sub("^.*\n", '', quote)
+            # Removes anything inside [] or ()
+            quoteText = re.sub(r"[\[\(].*[\]\)]", '', quoteText)
+            quoteText = re.sub("  ", ' ', quoteText)
+
+            # sometimes two quotes are not seperated
+            if re.search(r'(\d\d):(\d\d):(\d\d)', quoteText):
+                print(f"Invalid format of {quote=} in {subFile=}")
+                continue
+
+            # Formatting
+            quoteText = quoteText.strip()
+            quoteText = re.sub(
+                r"^(and|but|so|also)\W*|" +
+                r"([^a-zA-Z\?\.\!]*and|but|so|also)\W*$",
+                '',
+                quoteText,
+                flags=re.I).strip()
+            quoteText = quoteText.capitalize()
+
+            # Filters
+            if len(re.sub(r'\s', '', quoteText)) < 2:
+                continue
+            if re.search('video|^welcome', quoteText, re.I):
+                # print(f"Banned words in '{quoteText}' of {subFile}")
+                continue
+
+            if 'done' in subFile:
+                doneQuotes.append((quoteText, youtubeLink))
+            else:
+                subQuotes.append((quoteText, youtubeLink))
+
+    return doneQuotes, subQuotes
+
+
+doneQuotes, subQuotes = quoteCreator()
+
+sizeDoneQuotes, sizeSubQuotes = len(doneQuotes), len(subQuotes)
