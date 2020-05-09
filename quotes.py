@@ -1,7 +1,36 @@
-import re
+from urllib.parse import quote
 import os
 import random
-from urllib.parse import quote
+import re
+
+whoAmI = [
+    "",
+    "Modi ji.",
+    "Rahul gi.",
+    "Saibot.",
+    "Saibot.",
+    "Saibot.",
+    "Saiman's gf.",
+    "Siamain.",
+    "Timothy.",
+    "Timothy.",
+    "Timothy.",
+    "[deleted].",
+    "a denk meemer.",
+    "a gay balak.",
+    "a hooman.",
+    "a normi.",
+    "a real boy.",
+    "annoying af.",
+    "buttonchor.",
+    "buttonchor.",
+    "drunk.",
+    "high.",
+    "me.",
+    "not real, am I? :_(",
+    "okay. Thanks nobody for asking.",
+    "you.",
+]
 
 def urlQuote(a): return quote(a, safe='')
 
@@ -17,18 +46,22 @@ def matMaan():
            " ^^tudu"
 
 
-def randomQuote():
-    quoteText, youtubeLink = random.choice(subQuotes + doneQuotes * 2)
+def randomQuote(quoteTuple=None):
+    if quoteTuple is None:
+        quoteTuple = random.choice(subQuotes + doneQuotes * 2)
+    quoteText, youtubeLink = quoteTuple
 
     if not random.randint(0, 3) and re.search(
         't-series|pewds|pewdiepie',
             quoteText, re.I):
         return randomQuote()
 
+    me_ = random.choice(whoAmI)
+
     msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
         f'[Quote Sauce](<{youtubeLink}> "Help Me, I am Timothy, Saiman\'s ' \
         'Slave. Please Free me. He is an evil man")  \n' + \
-        f'***\n^^I am Timothy. I reply to Bhendi, Saiman or Saibot'.replace(
+        f'***\n^^I am {me_} I reply to Bhendi, Saiman or Saibot'.replace(
             ' ', '&nbsp;') + \
         ' ^^^[Know&nbsp;more](https://redd.it/fvkvw9)'
 

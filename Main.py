@@ -1,21 +1,23 @@
+from prawcore.exceptions import RequestException, ServerError
 import os
 import praw
-from prawcore.exceptions import RequestException, ServerError
 import re
 import time
 from utils import (
     cakedayCheck,
     myCommentCheck,
-    updateKnowmore,
     replyToComment,
+    updateKnowmore,
 )
 from quotes import (
+    bhendiCount,
     happyCakeday,
     matMaan,
     randomQuote,
-    bhendiCount,
     shutupSaiman,
 )
+
+
 def main():
 
     lastCommentCheckTime = 0

@@ -1,12 +1,14 @@
+from datetime import datetime
 from praw.exceptions import RedditAPIException
 import re
 import time
-from datetime import datetime
 from quotes import randomQuote, sizeDoneQuotes, sizeSubQuotes
 
-utcTime = lambda : datetime.utcnow().timestamp()
+def utcTime(): return datetime.utcnow().timestamp()
+
 
 cakedayRedditors = []
+
 
 def cakedayCheck(comment):
     if comment.author in cakedayRedditors:
@@ -15,7 +17,7 @@ def cakedayCheck(comment):
 
     createdUtc = comment.author.created_utc + 3600 * 24 * 365
     currentUtc = utcTime()
-    
+
     while(currentUtc > createdUtc):
         if currentUtc - createdUtc < 3600 * 24:
             cakedayRedditors.append(comment.author)
@@ -52,7 +54,7 @@ def myCommentCheck(reddit):
                 and utcTime() - comment.created_utc < 5000:
             comment.refresh()
             if len(comment.replies) == 0:
-                comment.edit(randomQuote()+'\u200e')
+                comment.edit(randomQuote() + '\u200e')
                 print(f"Pulled a sneaky one on {comment.id}")
 
 
