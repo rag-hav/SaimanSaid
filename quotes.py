@@ -7,7 +7,7 @@ def urlQuote(a): return quote(a, safe='')
 
 
 def happyCakeday():
-    return "Happy cakeday! Here is a quote just for you  \n\n&nbsp;\n\n" +\
+    return "Happy cakeday! Here have a quote!  \n\n&nbsp;\n\n" +\
         randomQuote()
 
 

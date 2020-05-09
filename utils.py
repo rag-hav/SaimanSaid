@@ -16,10 +16,10 @@ def cakedayCheck(comment):
     createdUtc = comment.author.created_utc
     currentUtc = utcTime()
     while(createdUtc < currentUtc):
+        createdUtc += 3600 * 24 * 365
         if currentUtc - createdUtc < 3600 * 24:
             cakedayRedditors.append(comment.author)
             return True
-        createdUtc += 3600 * 24 * 365
     return False
 
 
@@ -52,6 +52,7 @@ def myCommentCheck(reddit):
             comment.refresh()
             if len(comment.replies) == 0:
                 comment.edit(randomQuote()+'\u200e')
+                print(f"Pulled a sneaky one on {comment.id}")
 
 
 def updateKnowmore(reddit):
