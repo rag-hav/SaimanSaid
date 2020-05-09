@@ -13,13 +13,14 @@ def cakedayCheck(comment):
         # Already Wished
         return False
 
-    createdUtc = comment.author.created_utc
+    createdUtc = comment.author.created_utc + 3600 * 24 * 365
     currentUtc = utcTime()
-    while(createdUtc < currentUtc):
-        createdUtc += 3600 * 24 * 365
+    
+    while(currentUtc > createdUtc):
         if currentUtc - createdUtc < 3600 * 24:
             cakedayRedditors.append(comment.author)
             return True
+        createdUtc += 3600 * 24 * 365
     return False
 
 
