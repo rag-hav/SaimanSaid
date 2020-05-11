@@ -42,7 +42,7 @@ def main():
 
         if re.search(r"chup|shut ?up|block|stop", comment.body, re.I) \
                 and comment.parent().author == me:
-            print(f"Replying to '{comment.id}' with shutupSaiman")
+            print(f"Replying to '{comment.permalink}' with shutupSaiman")
             replyToComment(comment, shutupSaiman())
             reddit.redditor("I_eat_I_repeat").message(
                     "Shutup Saiman", comment.permalink)
@@ -56,24 +56,24 @@ def main():
                 if re.search(r"mat+ ma+n+", reply.body, re.I):
                     break
             else:
-                print(f"Replying to '{comment.id}' with mat mann")
+                print(f"Replying to '{comment.permalink}' with mat mann")
                 replyToComment(comment, matMaan())
                 comment.save()
 
         elif cakedayCheck(comment):
-            print(f"Replying to '{comment.id}' with Cakeday")
+            print(f"Replying to '{comment.permalink}' with Cakeday")
             replyToComment(comment, happyCakeday())
             comment.save()
 
         elif re.search(
             r"\bSaiman\b|\bBhe+ndi\b|\bSaiman-?Said\b|\bSai ?-?bot\b",
                 comment.body, re.I):
-            print(f"Replying to '{comment.id}' with random quote")
+            print(f"Replying to '{comment.permalink}' with random quote")
             replyToComment(comment, randomQuote())
             comment.save()
 
         elif re.search(r"bhendicount", comment.body, re.I):
-            print(f"Replying to '{comment.id}' with bhendi count")
+            print(f"Replying to '{comment.permalink}' with bhendi count")
             replyToComment(comment, bhendiCount(comment))
             comment.save()
 
