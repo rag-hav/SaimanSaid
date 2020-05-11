@@ -76,8 +76,7 @@ def bhendiCount(sourceComment):
         ">) | [Know more](<https://redd.it/fvkvw9>)"
     footer = '  ' + footer.replace(' ', '&nbsp;').replace('<_>', ' ')
 
-    if targetUserRegex:
-        = re.search(r'u/(\w+)', sourceComment.body, re.I):
+    if targetUserRegex := re.search(r'u/(\w+)', sourceComment.body, re.I):
         targetUsername = targetUserRegex.group(1)
         targetRedditor = reddit.redditor(targetUsername)
     else:
@@ -135,8 +134,7 @@ def quoteCreator():
             continue
         quotes = open(subFile, 'r').read().split('\n\n')
         for quote in quotes:
-            if quoteTime:
-                = re.match(r"(\d\d):(\d\d):(\d\d)", quote):
+            if quoteTime := re.match(r"(\d\d):(\d\d):(\d\d)", quote):
                 hh, mm, ss = quoteTime.groups()
             else:
 
