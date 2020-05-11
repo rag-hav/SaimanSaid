@@ -57,7 +57,7 @@ def commentCheck(reddit):
 
 def inboxCheck(reddit):
     for msg in reddit.inbox.messages():
-        if msg.subject("Block me"):
+        if msg.subject == "Block me":
             msg.author.block()
             reddit.redditor("I_eat_I_repeat").message(
                 "User Blocked",'u/'+msg.author.name)
@@ -78,14 +78,14 @@ def replyToComment(comment, replyTxt):
 def updateKnowmore(reddit):
     Knowmore = reddit.submission("fvkvw9")
     srch = r"Currently, the bot has (\d+) filtered quotes and (\d+) "\
-        "unfiltered quotes in its database"
+        r"unfiltered quotes in its database"
     oldDoneNum, oldSubNum = re.search(srch, Knowmore.selftext).groups()
 
     if int(oldDoneNum) != sizeDoneQuotes or int(oldSubNum) != sizeSubQuotes:
         newBody = re.sub(
             srch,
             f"Currently, the bot has {sizeDoneQuotes} filtered quotes "
-            "and {sizeSubQuotes} unfiltered quotes in its database",
+            f"and {sizeSubQuotes} unfiltered quotes in its database",
             Knowmore.selftext)
         Knowmore.edit(newBody)
         print(f"Knowmore Updated: {sizeDoneQuotes} done quotes "
