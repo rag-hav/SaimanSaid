@@ -64,12 +64,6 @@ def inboxCheck(reddit):
                 "User Blocked",'u/'+msg.author.name)
             msg.author.block()
 
-        elif re.search(
-            r"\bSaiman\b|\bBhe+ndi\b|\bSaiman-?Said(bot)?\b|\bSai ?-?bot\b",
-                msg.body, re.I):
-            replyToComment(msg, randomQuote())
-            print(f"Replying to message with random quote")
-            msg.delete()
             
 def replyToComment(comment, replyTxt):
     '''Wrapper to handle API limit exception'''
