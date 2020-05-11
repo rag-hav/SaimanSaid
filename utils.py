@@ -59,9 +59,17 @@ def inboxCheck(reddit):
     for msg in reddit.inbox.messages():
         if msg.subject == "Block me":
             msg.reply("Okay done")
+            print("User Blocked: "+msg.author.name)
             reddit.redditor("I_eat_I_repeat").message(
                 "User Blocked",'u/'+msg.author.name)
             msg.author.block()
+
+        elif re.search(
+            r"\bSaiman\b|\bBhe+ndi\b|\bSaiman-?Said(bot)?\b|\bSai ?-?bot\b",
+                msg.body, re.I):
+            replyToComment(msg, randomQuote())
+            print(f"Replying to message with random quote")
+            msg.delete()
             
 def replyToComment(comment, replyTxt):
     '''Wrapper to handle API limit exception'''
