@@ -4,8 +4,6 @@ import re
 import time
 from quotes import randomQuote, sizeDoneQuotes, sizeSubQuotes
 
-def utcTime(): return datetime.utcnow().timestamp()
-
 
 cakedayRedditors = []
 
@@ -26,7 +24,7 @@ def cakedayCheck(comment):
     return False
 
 
-def myCommentCheck(reddit):
+def commentCheck(reddit):
     for comment in reddit.user.me().comments.new():
 
         # Get Already wished redditors btw runs
@@ -57,6 +55,25 @@ def myCommentCheck(reddit):
                 comment.edit(randomQuote() + '\u200e')
                 print(f"Pulled a sneaky one on {comment.id}")
 
+def inboxCheck(reddit):
+    for msg in reddit.inbox.messages():
+        if msg.subject("Block me"):
+            msg.author.block()
+            reddit.redditor("I_eat_I_repeat").message(
+                "User Blocked",'u/'+msg.author.name)
+            
+def replyToComment(comment, replyTxt):
+    '''Wrapper to handle API limit exception'''
+
+    try:
+        comment.reply(replyTxt)
+
+    except RedditAPIException as exception:
+        for subexception in exception.items:
+            print(subexception.error_type)
+            time.sleep(5)
+            replyToComment(comment, replyTxt)
+
 
 def updateKnowmore(reddit):
     Knowmore = reddit.submission("fvkvw9")
@@ -75,14 +92,4 @@ def updateKnowmore(reddit):
               f"and {sizeSubQuotes} sub quotes")
 
 
-def replyToComment(comment, replyTxt):
-    '''Wrapper to handle API limit exception'''
-
-    try:
-        comment.reply(replyTxt)
-
-    except RedditAPIException as exception:
-        for subexception in exception.items:
-            print(subexception.error_type)
-            time.sleep(5)
-            replyToComment(comment, replyTxt)
+def utcTime(): return datetime.utcnow().timestamp()

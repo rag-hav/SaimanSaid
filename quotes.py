@@ -120,8 +120,9 @@ def shutupSaiman():
         "  \n\n&nbsp;\n\n[Quote Sauce]"\
         "(<https://youtu.be/wQ2zsMyOMWc/?t=00h07m55s>)" + \
         "  \n***\n^P.S. ^You ^can ^simply ^[block&nbsp;me]"\
-        "(https://new.reddit.com/settings/messaging) ^to ^hide ^all "\
-        "^my ^comments ^from ^you  \n\n" + \
+        "(https://redd.it/gh42zl) ^to ^hide ^all "\
+        "^my ^comments ^from ^you ^or ^to ^stop ^getting " \
+        "^replies ^from ^me.\n\n  " + \
         "^^[PM&nbsp;my&nbsp;creator](<https://www.reddit.com/message/compose/"\
         "?to=I_eat_I_repeat&subject=Complaint%20SaimanSaid>)&nbsp;"\
         "for&nbsp;any ^^complaints."
@@ -150,9 +151,12 @@ def quoteCreator():
 
             # Removes the time stamp
             quoteText = re.sub("^.*\n", '', quote)
-            # Removes anything inside [] or ()
-            quoteText = re.sub(r"[\[\(].*[\]\)]", '', quoteText)
+            # Removes anything inside [] or () 
+            quoteText = re.sub(r"\[.*\]", '', quoteText)
+            quoteText = re.sub(r"\(.*\)", '', quoteText)
             quoteText = re.sub("  ", ' ', quoteText)
+            # Remove starting -
+            quoteText = re.sub("^\s*-\s*", '', quoteText)
 
             # sometimes two quotes are not seperated
             if re.search(r'(\d\d):(\d\d):(\d\d)', quoteText):

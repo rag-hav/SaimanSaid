@@ -5,7 +5,8 @@ import re
 import time
 from utils import (
     cakedayCheck,
-    myCommentCheck,
+    commentCheck,
+    inboxCheck,
     replyToComment,
     updateKnowmore,
 )
@@ -20,26 +21,32 @@ from quotes import (
 
 def main():
 
-    lastCommentCheckTime = 0
-    SaimanSays = reddit.subreddit("SaimanSays")
+    commentCheckTime = time.time()
+    inboxCheckTime =  time.time()
     me = reddit.user.me()
 
-    for comment in SaimanSays.stream.comments():
+    for comment in reddit.subreddit("SaimanSays").stream.comments():
 
-        if time.time() - lastCommentCheckTime > 1800:
-            myCommentCheck(reddit)
-            lastCommentCheckTime = time.time()
+        if time.time() > inboxCheckTime:
+            inboxCheck(reddit)
+            inboxCheckTime = time.time() + 3600 * 12
+
+        if time.time() > commentCheckTime:
+            commentCheck(reddit)
+            commentCheckTime = time.time() + 1800
 
         if comment.saved \
                 or comment.author == me \
                 or re.search(r"\bre+post\b", comment.body, re.I):
             continue
 
-        if re.search(r"chup|shut ?up|block", comment.body,
-                     re.I) and comment.parent().author == me:
+        if re.search(r"chup|shut ?up|block|stop", comment.body, re.I) \
+                and comment.parent().author == me:
             print(f"Replying to '{comment.id}' with shutupSaiman")
             replyToComment(comment, shutupSaiman())
-            print("\tSuccess")
+            reddit.redditor("I_eat_I_repeat").message(
+                    "Shutup Saiman", comment.permalink)
+            inboxCheckTime = time.time() + 3600
             comment.save()
 
         elif re.match(r"(lol )?(xd )?m[ae]in? k(ai|e)se maa?n lu\?*",
@@ -51,13 +58,11 @@ def main():
             else:
                 print(f"Replying to '{comment.id}' with mat mann")
                 replyToComment(comment, matMaan())
-                print("\tSuccess")
                 comment.save()
 
         elif cakedayCheck(comment):
             print(f"Replying to '{comment.id}' with Cakeday")
             replyToComment(comment, happyCakeday())
-            print("\tSuccess")
             comment.save()
 
         elif re.search(
@@ -65,13 +70,11 @@ def main():
                 comment.body, re.I):
             print(f"Replying to '{comment.id}' with random quote")
             replyToComment(comment, randomQuote())
-            print("\tSuccess")
             comment.save()
 
         elif re.search(r"bhendicount", comment.body, re.I):
             print(f"Replying to '{comment.id}' with bhendi count")
             replyToComment(comment, bhendiCount(comment))
-            print("\tSuccess")
             comment.save()
 
 
