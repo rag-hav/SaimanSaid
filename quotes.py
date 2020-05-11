@@ -32,18 +32,13 @@ whoAmI = [
     "you.",
 ]
 
+
 def urlQuote(a): return quote(a, safe='')
 
 
 def happyCakeday():
     return "Happy cakeday! Here have a quote!  \n\n&nbsp;\n\n" +\
         randomQuote()
-
-
-def matMaan():
-    return "mat maan  \n\n***\n" +\
-           "^^(I am dddisco dancerr tu tu)".replace(" ", "&nbsp;") +\
-           " ^^tudu"
 
 
 def randomQuote(quoteTuple=None):
@@ -81,7 +76,8 @@ def bhendiCount(sourceComment):
         ">) | [Know more](<https://redd.it/fvkvw9>)"
     footer = '  ' + footer.replace(' ', '&nbsp;').replace('<_>', ' ')
 
-    if targetUserRegex := re.search(r'u/(\w+)', sourceComment.body, re.I):
+    if targetUserRegex:
+        = re.search(r'u/(\w+)', sourceComment.body, re.I):
         targetUsername = targetUserRegex.group(1)
         targetRedditor = reddit.redditor(targetUsername)
     else:
@@ -139,7 +135,8 @@ def quoteCreator():
             continue
         quotes = open(subFile, 'r').read().split('\n\n')
         for quote in quotes:
-            if quoteTime := re.match(r"(\d\d):(\d\d):(\d\d)", quote):
+            if quoteTime:
+                = re.match(r"(\d\d):(\d\d):(\d\d)", quote):
                 hh, mm, ss = quoteTime.groups()
             else:
 
@@ -151,12 +148,12 @@ def quoteCreator():
 
             # Removes the time stamp
             quoteText = re.sub("^.*\n", '', quote)
-            # Removes anything inside [] or () 
+            # Removes anything inside [] or ()
             quoteText = re.sub(r"\[.*\]", '', quoteText)
             quoteText = re.sub(r"\(.*\)", '', quoteText)
             quoteText = re.sub("  ", ' ', quoteText)
             # Remove starting -
-            quoteText = re.sub("^\s*-\s*", '', quoteText)
+            quoteText = re.sub(r"^\s*-\s*", '', quoteText)
 
             # sometimes two quotes are not seperated
             if re.search(r'(\d\d):(\d\d):(\d\d)', quoteText):

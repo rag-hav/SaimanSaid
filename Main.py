@@ -13,7 +13,6 @@ from utils import (
 from quotes import (
     bhendiCount,
     happyCakeday,
-    matMaan,
     randomQuote,
     shutupSaiman,
 )
@@ -22,7 +21,7 @@ from quotes import (
 def main():
 
     commentCheckTime = time.time()
-    inboxCheckTime =  time.time()
+    inboxCheckTime = time.time()
     me = reddit.user.me()
 
     for comment in reddit.subreddit("SaimanSays").stream.comments():
@@ -45,20 +44,9 @@ def main():
             print(f"Replying to '{comment.permalink}' with shutupSaiman")
             replyToComment(comment, shutupSaiman())
             reddit.redditor("I_eat_I_repeat").message(
-                    "Shutup Saiman", comment.permalink)
+                "Shutup Saiman", comment.permalink)
             inboxCheckTime = time.time() + 3600
             comment.save()
-
-        elif re.match(r"(lol )?(xd )?m[ae]in? k(ai|e)se maa?n lu\?*",
-                      comment.body, re.I):
-            comment.refresh()
-            for reply in comment.replies:
-                if re.search(r"mat+ ma+n+", reply.body, re.I):
-                    break
-            else:
-                print(f"Replying to '{comment.permalink}' with mat mann")
-                replyToComment(comment, matMaan())
-                comment.save()
 
         elif cakedayCheck(comment):
             print(f"Replying to '{comment.permalink}' with Cakeday")

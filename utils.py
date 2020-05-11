@@ -55,16 +55,17 @@ def commentCheck(reddit):
                 comment.edit(randomQuote() + '\u200e')
                 print(f"Pulled a sneaky one on {comment.permalink}")
 
+
 def inboxCheck(reddit):
     for msg in reddit.inbox.messages():
         if msg.subject == "Block me":
             msg.reply("Okay done")
-            print("User Blocked: "+msg.author.name)
+            print("User Blocked: " + msg.author.name)
             reddit.redditor("I_eat_I_repeat").message(
-                "User Blocked",'u/'+msg.author.name)
+                "User Blocked", 'u/' + msg.author.name)
             msg.author.block()
 
-            
+
 def replyToComment(comment, replyTxt):
     '''Wrapper to handle API limit exception'''
 
