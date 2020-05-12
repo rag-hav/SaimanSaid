@@ -2,6 +2,8 @@ from prawcore.exceptions import RequestException, ServerError
 import os
 import praw
 import re
+import signal
+import sys
 import time
 from utils import (
     cakedayCheck,
@@ -20,11 +22,15 @@ from quotes import (
 
 def main():
 
-    commentCheckTime = time.time()
-    inboxCheckTime = time.time()
+    commentCheckTime = 0
+    inboxCheckTime = 0
     me = reddit.user.me()
 
     for comment in reddit.subreddit("SaimanSays").stream.comments():
+
+        global IN_LOOP, EXIT
+
+        IN_LOOP = True
 
         if time.time() > inboxCheckTime:
             inboxCheck(reddit)
@@ -43,35 +49,51 @@ def main():
                 and comment.parent().author == me:
             print(f"Replying to '{comment.permalink}' with shutupSaiman")
             replyToComment(comment, shutupSaiman())
+
             reddit.redditor("I_eat_I_repeat").message(
-                "Shutup Saiman", comment.permalink)
+                "Sent a Shutup Saiman", comment.permalink)
             inboxCheckTime = time.time() + 3600
-            comment.save()
 
         elif cakedayCheck(comment):
             print(f"Replying to '{comment.permalink}' with Cakeday")
             replyToComment(comment, happyCakeday())
-            comment.save()
 
         elif re.search(
-            r"\bBh[ei]+ndi\b|\bSaiman-? ?Said(bot)?\b|\bSai ?-?bot\b",
+            r"\bBh[ei]+ndi\b|\bSaiman-? ?Said( ?bot)?\b|\bSai ?-?bot\b",
                 comment.body, re.I):
             print(f"Replying to '{comment.permalink}' with random quote")
             replyToComment(comment, randomQuote())
-            comment.save()
 
         elif re.search(r"bhendicount", comment.body, re.I):
             print(f"Replying to '{comment.permalink}' with bhendi count")
             replyToComment(comment, bhendiCount(comment))
-            comment.save()
+
+        IN_LOOP = False
+
+        if EXIT:
+            return
+
+
+def signalHandler(signal, frame):
+    global EXIT
+    print(f"RECIEVED SIGNAL: {signal}, Bye")
+    if not IN_LOOP:
+        sys.exit(0)
+    else:
+        EXIT = True
 
 
 reddit = praw.Reddit(
-    client_id=os.environ.get("SaimanSaid_CLIENT_ID"),
-    client_secret=os.environ.get("SaimanSaid_CLIENT_SECRET"),
-    user_agent=os.environ.get("SaimanSaid_USER_AGENT"),
-    username=os.environ.get("SaimanSaid_USERNAME"),
-    password=os.environ.get("SaimanSaid_PASSWORD"))
+    client_id=os.getenv("SaimanSaid_CLIENT_ID"),
+    client_secret=os.getenv("SaimanSaid_CLIENT_SECRET"),
+    user_agent=os.getenv("SaimanSaid_USER_AGENT"),
+    username=os.getenv("SaimanSaid_USERNAME"),
+    password=os.getenv("SaimanSaid_PASSWORD"))
+
+signal.signal(signal.SIGINT, signalHandler)
+signal.signal(signal.SIGTERM, signalHandler)
+EXIT = False
+IN_LOOP = False
 
 if __name__ == "__main__":
     print("Starting the bot")
@@ -83,9 +105,7 @@ if __name__ == "__main__":
         except (RequestException, ServerError) as e:
             print(e)
             time.sleep(60)
-        except KeyboardInterrupt:
-            print("Killing all operations; Over and Out")
-            break
         else:
-            raise "Program Finished, It really shouldn't"
-            break
+            if not EXIT:
+                raise "Program Finished Abnormally"
+                break
