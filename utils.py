@@ -1,9 +1,6 @@
 from datetime import datetime
-from praw.exceptions import RedditAPIException
 import re
-import time
 from quotes import randomQuote, sizeDoneQuotes, sizeSubQuotes
-
 
 cakedayRedditors = []
 
@@ -35,15 +32,13 @@ def commentCheck(reddit):
 
         # Delete bad comnents
         if comment.score < -4:
+            parentId = comment.parent().permalink.replace(
+                    "reddit", "removeddit")
             comment.delete()
             reddit.redditor("I_eat_I_repeat").message(
-                "Comment deleted",
-                comment.body +
-                '\n\n' +
-                comment.parent().permalink.replace(
-                    "reddit",
-                    "removeddit"))
-            print("Deleted comment {comment.permalink}")
+                    "Comment deleted",
+                    comment.body + '\n\n' + parentId)
+            print("Deleted comment {parentId}")
 
         # Pull a sneaky one
         elif comment.score < 0 \
@@ -67,16 +62,10 @@ def inboxCheck(reddit):
 
 
 def replyToComment(comment, replyTxt):
-    '''Wrapper to handle API limit exception'''
 
-    try:
-        comment.reply(replyTxt)
-
-    except RedditAPIException as exception:
-        for subexception in exception.items:
-            print(subexception.error_type)
-            time.sleep(5)
-            replyToComment(comment, replyTxt)
+    replyComment = comment.reply(replyTxt)
+    comment.save()
+    print("\tSuccess: " + replyComment.id)
 
 
 def updateKnowmore(reddit):
