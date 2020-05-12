@@ -46,7 +46,7 @@ def urlQuote(a): return quote(a, safe='')
 
 def happyCakeday():
     return "Happy cakeday! Here have a quote!  \n\n&nbsp;\n\n" +\
-        randomQuote()
+        randomQuote() + '\u200e'
 
 
 def randomQuote(quoteTuple=None):
@@ -177,8 +177,9 @@ def quoteCreator():
             quoteText = quoteText.capitalize()
 
             # Filters
-            if len(re.sub(r'\W|saiman|timothy|a+ditya', '',
-                    quoteText,flags=re.I)) < 2:
+            if len(re.sub(
+                    r'\W|saiman|timothy|a+ditya', '',
+                    quoteText, flags=re.I)) < 2:
                 continue
             if re.search('video|^welcome', quoteText, re.I):
                 # print(f"Banned words in '{quoteText}' of {subFile}")
