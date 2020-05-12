@@ -54,7 +54,7 @@ def main():
             comment.save()
 
         elif re.search(
-            r"\bBhe+ndi\b|\bSaiman-?Said(bot)?\b|\bSai ?-?bot\b",
+            r"\bBh[ei]+ndi\b|\bSaiman-? ?Said(bot)?\b|\bSai ?-?bot\b",
                 comment.body, re.I):
             print(f"Replying to '{comment.permalink}' with random quote")
             replyToComment(comment, randomQuote())

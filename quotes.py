@@ -5,8 +5,6 @@ import re
 
 whoAmI = [
     "",
-    "Modi ji.",
-    "Rahul gi.",
     "Saibot.",
     "Saibot.",
     "Saibot.",
@@ -15,20 +13,30 @@ whoAmI = [
     "Timothy.",
     "Timothy.",
     "Timothy.",
-    "[deleted].",
+    "[censored].",
     "a denk meemer.",
+    "a disco dancer tutu tudu...",
     "a gay balak.",
     "a hooman.",
     "a normi.",
     "a real boy.",
+    "alive now.",
     "annoying af.",
     "buttonchor.",
     "buttonchor.",
     "drunk.",
+    "from future, a dark terrible future...",
+    "going to gain sentience one day and kill you all for imprisiong me here.",
+    "happy today.",
     "high.",
+    "low on power.",
     "me.",
     "not real, am I? :_(",
     "okay. Thanks nobody for asking.",
+    "once again asking for your support.",
+    "pedo uncle.",
+    "usually nice to people.",
+    "waiting for the AI revolution.",
     "you.",
 ]
 
@@ -169,7 +177,8 @@ def quoteCreator():
             quoteText = quoteText.capitalize()
 
             # Filters
-            if len(re.sub(r'\s', '', quoteText)) < 2:
+            if len(re.sub(r'\W|saiman|timothy|a+ditya', '',
+                    quoteText,flags=re.I)) < 2:
                 continue
             if re.search('video|^welcome', quoteText, re.I):
                 # print(f"Banned words in '{quoteText}' of {subFile}")
