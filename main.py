@@ -6,6 +6,7 @@ import signal
 import sys
 import time
 from utils import (
+    SignalHandler,
     cakedayCheck,
     commentCheck,
     inboxCheck,
@@ -22,15 +23,16 @@ from quotes import (
 
 def main():
 
+    signalHandler = SignalHandler()
+    updateKnowmore(reddit)
+
     commentCheckTime = 0
     inboxCheckTime = 0
     me = reddit.user.me()
 
     for comment in reddit.subreddit("SaimanSays").stream.comments():
 
-        global IN_LOOP, EXIT
-
-        IN_LOOP = True
+        signalHandler.loopStart()
 
         if time.time() > inboxCheckTime:
             inboxCheck(reddit)
@@ -68,19 +70,8 @@ def main():
             print(f"Replying to '{comment.permalink}' with bhendi count")
             replyToComment(comment, bhendiCount(comment))
 
-        IN_LOOP = False
+        signalHandler.loopEnd()
 
-        if EXIT:
-            return
-
-
-def signalHandler(signal, frame):
-    global EXIT
-    print(f"RECIEVED SIGNAL: {signal}, Bye")
-    if not IN_LOOP:
-        sys.exit(0)
-    else:
-        EXIT = True
 
 
 reddit = praw.Reddit(
@@ -90,14 +81,9 @@ reddit = praw.Reddit(
     username=os.getenv("SaimanSaid_USERNAME"),
     password=os.getenv("SaimanSaid_PASSWORD"))
 
-signal.signal(signal.SIGINT, signalHandler)
-signal.signal(signal.SIGTERM, signalHandler)
-EXIT = False
-IN_LOOP = False
 
 if __name__ == "__main__":
     print("Starting the bot")
-    updateKnowmore(reddit)
     while(True):
         try:
             main()
@@ -106,6 +92,5 @@ if __name__ == "__main__":
             print(e)
             time.sleep(60)
         else:
-            if not EXIT:
-                raise "Program Finished Abnormally"
-                break
+            raise "Program Finished Abnormally"
+            break

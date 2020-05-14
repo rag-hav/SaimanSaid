@@ -1,8 +1,35 @@
 from datetime import datetime
 import re
+import sys
+import signal
 from quotes import randomQuote, sizeDoneQuotes, sizeSubQuotes
 
 cakedayRedditors = []
+
+
+class SignalHandler():
+
+    def __init__(self):
+        signal.signal(signal.SIGINT, self._signalHandler)
+        signal.signal(signal.SIGTERM, self._signalHandler)
+        self.exitCondition = False
+        self.inLoop = False
+
+    def _signalHandler(self, signal, frame):
+        print(f"RECIEVED SIGNAL: {signal}, Bye")
+        if not self.inLoop:
+            sys.exit(0)
+        else:
+            self.exitCondition = True
+
+    def loopEnd(self):
+        self.inLoop = False
+
+        if self.exitCondition:
+            sys.exit(0)
+
+    def loopStart(self):
+        self.inLoop = True
 
 
 def cakedayCheck(comment):
