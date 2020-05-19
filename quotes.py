@@ -134,8 +134,8 @@ def quoteCreator():
             # Formatting
             quoteText = quoteText.strip()
             quoteText = re.sub(
-                r"^(and|but|so|also)\W*|" +
-                r"([^a-zA-Z\?\.\!]*and|but|so|also)\W*$",
+                r"^\W*(and|but|so|also|that|i mean)\W*|" +
+                r"([^a-zA-Z\?\.\!]*and|but|so|beacuse|also)\W*$",
                 '',
                 quoteText,
                 flags=re.I).strip()
