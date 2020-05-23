@@ -1,7 +1,7 @@
 from prawcore.exceptions import RequestException, ServerError
 import os
-import praw
 import re
+from Reddit import reddit
 import signal
 import sys
 import time
@@ -21,9 +21,9 @@ from quotes import (
 )
 
 
+signalHandler = SignalHandler()
 def main():
 
-    signalHandler = SignalHandler()
     updateKnowmore(reddit)
 
     commentCheckTime = 0
@@ -71,15 +71,6 @@ def main():
             replyToComment(comment, bhendiCount(comment))
 
         signalHandler.loopEnd()
-
-
-
-reddit = praw.Reddit(
-    client_id=os.getenv("SaimanSaid_CLIENT_ID"),
-    client_secret=os.getenv("SaimanSaid_CLIENT_SECRET"),
-    user_agent=os.getenv("SaimanSaid_USER_AGENT"),
-    username=os.getenv("SaimanSaid_USERNAME"),
-    password=os.getenv("SaimanSaid_PASSWORD"))
 
 
 if __name__ == "__main__":

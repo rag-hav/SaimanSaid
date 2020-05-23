@@ -2,7 +2,6 @@ from urllib.parse import quote
 import os
 import random
 import re
-from whoami import whoAmI
 
 
 def urlQuote(a): return quote(a, safe='')
@@ -11,6 +10,15 @@ def urlQuote(a): return quote(a, safe='')
 def happyCakeday():
     return "Happy cakeday! Here have a quote!  \n\n&nbsp;\n\n" +\
         randomQuote() + '\u200e'
+
+
+def getWhoAmI():
+    from Reddit import reddit
+    wikiPg = reddit.subreddit("SaimanSaid").wiki["whoami"].content_md
+    return [a.strip() for a in wikiPg.splitlines() if not a == '']
+
+
+whoAmI = getWhoAmI()
 
 
 def randomQuote(quoteTuple=None):
