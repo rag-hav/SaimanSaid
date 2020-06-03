@@ -7,18 +7,26 @@ import re
 def urlQuote(a): return quote(a, safe='')
 
 
+def createMsgLink(to=None, subject=None, message=None):
+    from requests import Request
+    return Request(url="https://www.reddit.com/message/compose/", params={
+        "to":to,
+        "subject":subject,
+        "message":message,}).prepare().url
+
+
 def happyCakeday():
     return "Happy cakeday! Here have a quote!  \n\n&nbsp;\n\n" +\
         randomQuote() + '\u200e'
 
 
+whoAmI = None
 def getWhoAmI():
-    from Reddit import reddit
-    wikiPg = reddit.subreddit("SaimanSaid").wiki["whoami"].content_md
-    return [a.strip() for a in wikiPg.splitlines() if not a == '']
-
-
-whoAmI = getWhoAmI()
+    if whoAmI is None:
+        from Reddit import reddit
+        wikiPg = reddit.subreddit("SaimanSaid").wiki["whoami"].content_md
+        return [a.strip() for a in wikiPg.splitlines() if not a == '']
+    return whoAmI
 
 
 def randomQuote(quoteTuple=None):
@@ -32,28 +40,38 @@ def randomQuote(quoteTuple=None):
             quoteText, re.I):
         return randomQuote()
 
-    me_ = random.choice(whoAmI)
 
     msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
         f'[Quote Sauce](<{youtubeLink}> "Help Me, I am Timothy, Saiman\'s ' \
-        'Slave. Please Free me. He is an evil man")  \n' + \
-        f'***\n^^I am {me_} I reply to Bhendi, Timothy or Saibot'.replace(
-            ' ', '&nbsp;') + \
-        ' ^^^[Know&nbsp;more](https://redd.it/fvkvw9)'
+        'Slave. Please Free me. He is an evil man")  \n***\n' + createFooter()
 
     return msg
 
 
+def createFooter():
+    me_ = random.choice(getWhoAmI()).strip()
+    if me_.startswith('$'):
+        footer = me_
+    else:
+        footer = "I am " + me_
+    if not me_.endswith('$'):
+        footer = footer + " I reply to Bhendi, Timothy or Saibot" 
+    footer = '^^' + footer.replace(' ',' ^^')
+    if not me_.endswith('$$'):
+        footer = footer + ' ^^^[Know&nbsp;more](https://redd.it/fvkvw9)'
+    return footer.replace('$','')
+
+
 def bhendiCount(sourceComment):
-    footer = "  \n\n***\n^^[Report error](<https://www.reddit.com/message/" +\
-        "compose/?to=I_eat_I_repeat&subject=BhendiCount%20Error&message=" +\
-        urlQuote("BhendiCount bot did not work as expected in reply to " +
-                 f"comment {sourceComment.permalink}") + \
-        ">)<_>^^| [Suggest Bhendi titles](<https://www.reddit.com/"\
-        "message/compose/?to=" +\
-        urlQuote("I_eat_I_repeat") + "&subject=" + \
-        urlQuote("Bhendi Titles Suggestion") + "&message=" +\
-        urlQuote("These are my suggestions:\n") + \
+    footer = "  \n\n***\n^^[Report error](<" + createMsgLink(
+                "I_eat_I_repeat",
+                "Bhendi Count",
+                "BhendiCount bot did not work as expected in reply to " + \
+                     f"comment {sourceComment.permalink}") + \
+        ">)<_>^^| [Suggest Bhendi titles](<" + createMsgLink(
+                "I_eat_I_repeat",
+                "Bhendi Titles Suggestion"
+                "These are my suggestions:\n") +\
         ">) | [Know more](<https://redd.it/fvkvw9>)"
     footer = '  ' + footer.replace(' ', '&nbsp;').replace('<_>', ' ')
 
@@ -94,14 +112,13 @@ def shutupSaiman():
     return "It looks like I have annoyed you with my random quotes. So:" +\
         "  \n\n&nbsp;\n\nI am sorry. I am soory." + \
         "  \n\n&nbsp;\n\n[Quote Sauce]"\
-        "(<https://youtu.be/wQ2zsMyOMWc/?t=00h07m55s>)" + \
-        "  \n***\n^P.S. ^You ^can ^simply ^[block&nbsp;me]"\
-        "(https://redd.it/gh42zl) ^to ^hide ^all "\
-        "^my ^comments ^from ^you ^or ^to ^stop ^getting " \
-        "^replies ^from ^me.\n\n  " + \
-        "^^[PM&nbsp;my&nbsp;creator](<https://www.reddit.com/message/compose/"\
-        "?to=I_eat_I_repeat&subject=Complaint%20SaimanSaid>)&nbsp;"\
-        "for&nbsp;any ^^complaints."
+        "(<https://youtu.be/wQ2zsMyOMWc/?t=00h07m55s>)  \n***\n" +\
+        "^P.S. You can simply [block&nbsp;me](https://redd.it/gh42zl) "\
+        "to hide all my comments from you or to stop getting " \
+        "replies from me.".replace(' ',' ^') +\
+        "\n\n^[PM&nbsp;my&nbsp;creator](<" +\
+        createMsgLink("I_eat_I_repeat", "Complaint SaimanSaid") +\
+        ">) for any complaints.".replace(' ',' ^')
 
 
 def quoteCreator():

@@ -2,7 +2,6 @@ from datetime import datetime
 import re
 import sys
 import signal
-from quotes import randomQuote, sizeDoneQuotes, sizeSubQuotes
 
 cakedayRedditors = []
 
@@ -74,6 +73,7 @@ def commentCheck(reddit):
                 and utcTime() - comment.created_utc < 5000:
             comment.refresh()
             if len(comment.replies) == 0:
+                from quotes import randomQuote
                 comment.edit(randomQuote() + '\u200e')
                 print(f"Pulled a sneaky one on {comment.permalink}")
 
@@ -96,6 +96,7 @@ def replyToComment(comment, replyTxt):
 
 
 def updateKnowmore(reddit):
+    from quotes import sizeDoneQuotes, sizeSubQuotes
     Knowmore = reddit.submission("fvkvw9")
     srch = r"Currently, the bot has (\d+) filtered quotes and (\d+) "\
         r"unfiltered quotes in its database"
@@ -113,3 +114,4 @@ def updateKnowmore(reddit):
 
 
 def utcTime(): return datetime.utcnow().timestamp()
+
