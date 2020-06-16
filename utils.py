@@ -1,7 +1,9 @@
-from datetime import datetime
+from datetime import datetime, date, timedelta
 import re
+import os
 import sys
-import signal
+
+from Reddit import reddit
 
 cakedayRedditors = []
 
@@ -9,6 +11,7 @@ cakedayRedditors = []
 class SignalHandler():
 
     def __init__(self):
+        import signal
         signal.signal(signal.SIGINT, self._signalHandler)
         signal.signal(signal.SIGTERM, self._signalHandler)
         self.exitCondition = False
@@ -47,14 +50,12 @@ def cakedayCheck(comment):
     return False
 
 
-def commentCheck(reddit):
+def commentCheck():
     for comment in reddit.user.me().comments.new():
 
         # Get Already wished redditors btw runs
-        if re.search(r"^Happy cakeday", comment.body) and \
-                comment.author not in cakedayRedditors:
-
-            cakedayRedditors.append(comment.author)
+        if re.search(r"^Happy cakeday", comment.body):
+            cakedayRedditors.append(comment.parent().author)
 
         # Delete bad comnents
         if comment.score < -4:
@@ -78,7 +79,7 @@ def commentCheck(reddit):
                 print(f"Pulled a sneaky one on {comment.permalink}")
 
 
-def inboxCheck(reddit):
+def inboxCheck():
     for msg in reddit.inbox.messages():
         if msg.subject == "Block me":
             msg.reply("Okay done")
@@ -95,8 +96,11 @@ def replyToComment(comment, replyTxt):
     print("\tSuccess: " + replyComment.id)
 
 
-def updateKnowmore(reddit):
-    from quotes import sizeDoneQuotes, sizeSubQuotes
+def updateKnowmore():
+    from quotes import getAllQuotes
+    doneQuotes, subQuotes = getAllQuotes()
+    sizeDoneQuotes, sizeSubQuotes = len(doneQuotes), len(subQuotes)
+
     Knowmore = reddit.submission("fvkvw9")
     srch = r"Currently, the bot has (\d+) filtered quotes and (\d+) "\
         r"unfiltered quotes in its database"
@@ -115,3 +119,46 @@ def updateKnowmore(reddit):
 
 def utcTime(): return datetime.utcnow().timestamp()
 
+
+def _processSubtitle(vId):
+    # Checks if ydl has downloaded the subtitle and writes them to subs folder
+    for file_ in os.listdir():
+        if vId in file_:
+            with open(file_, 'r') as f:
+                subData = f.read()
+            cleanSub = '\n\n'.join(a for a in subData.split('\n\n')[1:] if a)
+            with open('subs/' + file_.split('.')[0], 'w') as f:
+                f.write(cleanSub)
+            print("Downloaded Subtitle for " + vId)
+            os.remove(file_)
+
+
+def downloadNewSubtitles():
+    from youtube_dl import YoutubeDL
+
+    playlistURL = 'https://www.youtube.com/playlist?list=UUy9cb7U-Asbhbum0ZXArvfQ'
+
+    ydlOpts = {'ignoreerrors': True, 'no_warnings' : True,
+                'quiet': True, 'outtmpl': '%(upload_date)s%(id)s',
+                'skip_download':True,}
+
+    with YoutubeDL(ydlOpts) as ydl:
+        playlistRes = ydl.extract_info(
+            playlistURL, download=False, process=False)
+
+    # Youtubedl doesnt return the info dict if this option is passed 
+    ydlOpts['writesubtitles'] = True
+
+    with YoutubeDL(ydlOpts) as ydl:
+        for vid in playlistRes['entries']:
+            for subFile in os.listdir("subs/") + os.listdir("subs/done/"):
+                if vid['id'] in subFile:
+                    # stop if video older than a month
+                    d = int(subFile[:8])
+                    if date.today() - date(d//10000, d//100 % 100, d%100) > \
+                            timedelta(days=30):
+                        return
+                    break
+            else:
+                vidRes = ydl.process_ie_result(vid, download=True)
+                _processSubtitle(vid['id'])

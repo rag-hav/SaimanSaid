@@ -1,10 +1,10 @@
-from urllib.parse import quote
-import os
 import random
 import re
 
 
-def urlQuote(a): return quote(a, safe='')
+def urlQuote(a):
+    from urllib.parse import quote
+    return quote(a, safe='')
 
 
 def createMsgLink(to=None, subject=None, message=None):
@@ -32,6 +32,7 @@ def getWhoAmI():
 def randomQuote(quoteTuple=None):
 
     if quoteTuple is None:
+        doneQuotes, subQuotes = getAllQuotes()
         quoteTuple = random.choice(subQuotes + doneQuotes * 2)
     quoteText, youtubeLink = quoteTuple
 
@@ -121,8 +122,15 @@ def shutupSaiman():
         ">) for any complaints.".replace(' ',' ^')
 
 
+doneQuotes, subQuotes =  [], []
+def getAllQuotes():
+    if not (doneQuotes or subQuotes):
+        quoteCreator()
+    return doneQuotes, subQuotes
+
+
 def quoteCreator():
-    doneQuotes, subQuotes = [], []
+    import os
     subFiles = [
         "subs/" + a for a in os.listdir("subs/")] + [
         "subs/done/" + a for a in os.listdir("subs/done/")]
@@ -175,14 +183,13 @@ def quoteCreator():
                 # print(f"Banned words in '{quoteText}' of {subFile}")
                 continue
 
+            quote = (quoteText, youtubeLink)
+
             if 'done' in subFile:
-                doneQuotes.append((quoteText, youtubeLink))
+                doneQuotes.append(quote)
             else:
-                subQuotes.append((quoteText, youtubeLink))
-
-    return doneQuotes, subQuotes
+                subQuotes.append(quote)
 
 
-doneQuotes, subQuotes = quoteCreator()
 
-sizeDoneQuotes, sizeSubQuotes = len(doneQuotes), len(subQuotes)
+

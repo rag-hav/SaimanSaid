@@ -9,6 +9,7 @@ from utils import (
     SignalHandler,
     cakedayCheck,
     commentCheck,
+    downloadNewSubtitles,
     inboxCheck,
     replyToComment,
     updateKnowmore,
@@ -24,7 +25,8 @@ from quotes import (
 signalHandler = SignalHandler()
 def main():
 
-    updateKnowmore(reddit)
+    downloadNewSubtitles()
+    updateKnowmore()
 
     commentCheckTime = 0
     inboxCheckTime = 0
@@ -35,11 +37,11 @@ def main():
         signalHandler.loopStart()
 
         if time.time() > inboxCheckTime:
-            inboxCheck(reddit)
+            inboxCheck()
             inboxCheckTime = time.time() + 3600 * 12
 
         if time.time() > commentCheckTime:
-            commentCheck(reddit)
+            commentCheck()
             commentCheckTime = time.time() + 1800
 
         if comment.saved \
