@@ -1,1 +1,2 @@
 praw==7.0.0
+youtube-dl
