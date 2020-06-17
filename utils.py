@@ -98,26 +98,39 @@ def replyToComment(comment, replyTxt):
 
 def updateKnowmore():
     from quotes import getAllQuotes
-    doneQuotes, subQuotes = getAllQuotes()
-    sizeDoneQuotes, sizeSubQuotes = len(doneQuotes), len(subQuotes)
+
+    allQuotes = getAllQuotes()
+    filteredQuotes, unfilteredQuotes = 0, 0
+    for quote in allQuotes:
+        if quote.handFiltered:
+            filteredQuotes += 1
+        else:
+            unfilteredQuotes += 1
 
     Knowmore = reddit.submission("fvkvw9")
     srch = r"Currently, the bot has (\d+) filtered quotes and (\d+) "\
         r"unfiltered quotes in its database"
-    oldDoneNum, oldSubNum = re.search(srch, Knowmore.selftext).groups()
+    oldFilteredQts, oldUnfilteredQts = re.search(srch, Knowmore.selftext).groups()
 
-    if int(oldDoneNum) != sizeDoneQuotes or int(oldSubNum) != sizeSubQuotes:
+    if int(oldFilteredQts) != filteredQuotes or int(oldUnfilteredQts) != unfilteredQuotes:
         newBody = re.sub(
             srch,
-            f"Currently, the bot has {sizeDoneQuotes} filtered quotes "
-            f"and {sizeSubQuotes} unfiltered quotes in its database",
+            f"Currently, the bot has {filteredQuotes} filtered quotes "
+            f"and {unfilteredQuotes} unfiltered quotes in its database",
             Knowmore.selftext)
         Knowmore.edit(newBody)
-        print(f"Knowmore Updated: {sizeDoneQuotes} done quotes "
-              f"and {sizeSubQuotes} sub quotes")
+        print(f"Knowmore Updated: {filteredQuotes} done quotes "
+              f"and {unfilteredQuotes} sub quotes")
 
 
 def utcTime(): return datetime.utcnow().timestamp()
+
+
+def getAge(timestamp):
+    # timestamp in format YYYYMMDD
+    from datetime import date
+    d = int(timestamp)
+    return (date.today() - date(d//10000, d//100%100, d%100)).days
 
 
 def _processSubtitle(vId):
@@ -146,6 +159,10 @@ def downloadNewSubtitles():
         playlistRes = ydl.extract_info(
             playlistURL, download=False, process=False)
 
+    if not playlistRes:
+        print("Failed to download Saiman's playlist, skipping new subtitle check")
+        return
+
     # Youtubedl doesnt return the info dict if this option is passed 
     ydlOpts['writesubtitles'] = True
 
@@ -153,10 +170,7 @@ def downloadNewSubtitles():
         for vid in playlistRes['entries']:
             for subFile in os.listdir("subs/") + os.listdir("subs/done/"):
                 if vid['id'] in subFile:
-                    # stop if video older than a month
-                    d = int(subFile[:8])
-                    if date.today() - date(d//10000, d//100 % 100, d%100) > \
-                            timedelta(days=30):
+                    if getAge(subFile[:8]) > 30:
                         return
                     break
             else:

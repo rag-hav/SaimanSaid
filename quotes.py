@@ -25,25 +25,19 @@ def getWhoAmI():
     if whoAmI is None:
         from Reddit import reddit
         wikiPg = reddit.subreddit("SaimanSaid").wiki["whoami"].content_md
-        return [a.strip() for a in wikiPg.splitlines() if not a == '']
+        return [a.strip() for a in wikiPg.splitlines() if a]
     return whoAmI
 
 
-def randomQuote(quoteTuple=None):
+def randomQuote(quote=None):
 
-    if quoteTuple is None:
-        doneQuotes, subQuotes = getAllQuotes()
-        quoteTuple = random.choice(subQuotes + doneQuotes * 2)
-    quoteText, youtubeLink = quoteTuple
-
-    if not random.randint(0, 3) and re.search(
-        't-series|pewds|pewdiepie',
-            quoteText, re.I):
-        return randomQuote()
+    if quote is None:
+        allQuotes = getAllQuotes()
+        quote = random.choices(allQuotes, [a.weight for a in allQuotes])[0]
 
 
-    msg = f'{quoteText}' + '\n\n&nbsp;\n\n' + \
-        f'[Quote Sauce](<{youtubeLink}> "Help Me, I am Timothy, Saiman\'s ' \
+    msg = f'{quote.quoteText}' + '\n\n&nbsp;\n\n' + \
+        f'[Quote Sauce](<{quote.youtubeLink}> "Help Me, I am Timothy, Saiman\'s ' \
         'Slave. Please Free me. He is an evil man")  \n***\n' + createFooter()
 
     return msg
@@ -122,32 +116,47 @@ def shutupSaiman():
         ">) for any complaints.".replace(' ',' ^')
 
 
-doneQuotes, subQuotes =  [], []
+allQuotes =  []
 def getAllQuotes():
-    if not (doneQuotes or subQuotes):
+    if not allQuotes:
         quoteCreator()
-    return doneQuotes, subQuotes
+    return allQuotes
+
+
+class Quote():
+    def __init__(self, quoteText, youtubeLink, weight, handFiltered):
+        self.quoteText = quoteText
+        self.youtubeLink = youtubeLink
+        self.weight = weight
+        self.handFiltered = handFiltered
 
 
 def quoteCreator():
     import os
-    subFiles = [
-        "subs/" + a for a in os.listdir("subs/")] + [
-        "subs/done/" + a for a in os.listdir("subs/done/")]
+    from math import sqrt
+    from utils import getAge
 
-    for subFile in subFiles:
-        if subFile == 'subs/done':
-            continue
-        quotes = open(subFile, 'r').read().split('\n\n')
+    subFiles = [
+        ("subs/", a) for a in os.listdir("subs/")] + [
+        ("subs/done/", a) for a in os.listdir("subs/done/")]
+    subFiles.remove(('subs/', 'done'))
+
+    oldestSubAge = getAge(min(int(a[:8]) for fldr, a in subFiles)) * 1.1
+
+    for fldr, subFile in subFiles:
+
+        with open(fldr + subFile, 'r') as f:
+            quotes = f.read().split('\n\n')
+
+        videoId = subFile[8:]
+        subAge = getAge(subFile[:8])
+
         for quote in quotes:
             if quoteTime := re.match(r"(\d\d):(\d\d):(\d\d)", quote):
                 hh, mm, ss = quoteTime.groups()
             else:
-
                 print(f"Time stamp not found in {quote=} \nof {subFile=}")
                 continue
-
-            videoId = os.path.basename(subFile)[3:]
             youtubeLink = f"https://youtu.be/{videoId}/?t={hh}h{mm}m{ss}s"
 
             # Removes the time stamp
@@ -177,19 +186,20 @@ def quoteCreator():
             # Filters
             if len(re.sub(
                     r'\W|saiman|timothy|a+ditya', '',
-                    quoteText, flags=re.I)) < 2:
+                    quoteText, flags=re.I)) < 3:
                 continue
             if re.search('video|^welcome', quoteText, re.I):
                 # print(f"Banned words in '{quoteText}' of {subFile}")
                 continue
 
-            quote = (quoteText, youtubeLink)
+            handFiltered = fldr == 'subs/done/'
+            weight = sqrt(1 - subAge/oldestSubAge)
 
-            if 'done' in subFile:
-                doneQuotes.append(quote)
-            else:
-                subQuotes.append(quote)
+            if re.search('t-series|pewds|pewdiepie', quoteText, re.I):
+                weight = weight/4
+            if handFiltered:
+                weight = weight * 1.2
 
-
-
+            quote = Quote(quoteText, youtubeLink, weight, handFiltered)
+            allQuotes.append(quote)
 
