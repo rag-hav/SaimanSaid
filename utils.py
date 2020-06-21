@@ -1,4 +1,3 @@
-from datetime import datetime, date, timedelta
 import re
 import os
 import sys
@@ -60,11 +59,11 @@ def commentCheck():
         # Delete bad comnents
         if comment.score < -4:
             parentId = comment.parent().permalink.replace(
-                    "reddit", "removeddit")
+                "reddit", "removeddit")
             comment.delete()
             reddit.redditor("I_eat_I_repeat").message(
-                    "Comment deleted",
-                    comment.body + '\n\n' + parentId)
+                "Comment deleted",
+                comment.body + '\n\n' + parentId)
             print("Deleted comment {parentId}")
 
         # Pull a sneaky one
@@ -110,9 +109,11 @@ def updateKnowmore():
     Knowmore = reddit.submission("fvkvw9")
     srch = r"Currently, the bot has (\d+) filtered quotes and (\d+) "\
         r"unfiltered quotes in its database"
-    oldFilteredQts, oldUnfilteredQts = re.search(srch, Knowmore.selftext).groups()
+    oldFilteredQts, oldUnfilteredQts = re.search(
+        srch, Knowmore.selftext).groups()
 
-    if int(oldFilteredQts) != filteredQuotes or int(oldUnfilteredQts) != unfilteredQuotes:
+    if int(oldFilteredQts) != filteredQuotes or int(
+            oldUnfilteredQts) != unfilteredQuotes:
         newBody = re.sub(
             srch,
             f"Currently, the bot has {filteredQuotes} filtered quotes "
@@ -123,14 +124,16 @@ def updateKnowmore():
               f"and {unfilteredQuotes} sub quotes")
 
 
-def utcTime(): return datetime.utcnow().timestamp()
+def utcTime():
+    from datetime import datetime
+    return datetime.utcnow().timestamp()
 
 
 def getAge(timestamp):
     # timestamp in format YYYYMMDD
     from datetime import date
     d = int(timestamp)
-    return (date.today() - date(d//10000, d//100%100, d%100)).days
+    return (date.today() - date(d // 10000, d // 100 % 100, d % 100)).days
 
 
 def _processSubtitle(vId):
@@ -149,21 +152,21 @@ def _processSubtitle(vId):
 def downloadNewSubtitles():
     from youtube_dl import YoutubeDL
 
-    playlistURL = 'https://www.youtube.com/playlist?list=UUy9cb7U-Asbhbum0ZXArvfQ'
+    playlist = 'https://www.youtube.com/playlist?list=UUy9cb7U-Asbhbum0ZXArvfQ'
 
-    ydlOpts = {'ignoreerrors': True, 'no_warnings' : True,
-                'quiet': True, 'outtmpl': '%(upload_date)s%(id)s',
-                'skip_download':True,}
+    ydlOpts = {'ignoreerrors': True, 'no_warnings': True,
+               'quiet': True, 'outtmpl': '%(upload_date)s%(id)s',
+               'skip_download': True
+               }
 
     with YoutubeDL(ydlOpts) as ydl:
-        playlistRes = ydl.extract_info(
-            playlistURL, download=False, process=False)
+        playlistRes = ydl.extract_info(playlist, download=False, process=False)
 
     if not playlistRes:
-        print("Failed to download Saiman's playlist, skipping new subtitle check")
+        print("Failed to download playlist, skipping new subtitle check")
         return
 
-    # Youtubedl doesnt return the info dict if this option is passed 
+    # Youtubedl doesnt return the info dict if this option is passed
     ydlOpts['writesubtitles'] = True
 
     with YoutubeDL(ydlOpts) as ydl:
@@ -174,5 +177,5 @@ def downloadNewSubtitles():
                         return
                     break
             else:
-                vidRes = ydl.process_ie_result(vid, download=True)
+                ydl.process_ie_result(vid, download=True)
                 _processSubtitle(vid['id'])

@@ -1,4 +1,6 @@
 import random
+from Reddit import reddit
+from prawcore.exceptions import NotFound
 import re
 
 
@@ -10,9 +12,9 @@ def urlQuote(a):
 def createMsgLink(to=None, subject=None, message=None):
     from requests import Request
     return Request(url="https://www.reddit.com/message/compose/", params={
-        "to":to,
-        "subject":subject,
-        "message":message,}).prepare().url
+        "to": to,
+        "subject": subject,
+        "message": message, }).prepare().url
 
 
 def happyCakeday():
@@ -21,9 +23,10 @@ def happyCakeday():
 
 
 whoAmI = None
+
+
 def getWhoAmI():
     if whoAmI is None:
-        from Reddit import reddit
         wikiPg = reddit.subreddit("SaimanSaid").wiki["whoami"].content_md
         return [a.strip() for a in wikiPg.splitlines() if a]
     return whoAmI
@@ -35,10 +38,9 @@ def randomQuote(quote=None):
         allQuotes = getAllQuotes()
         quote = random.choices(allQuotes, [a.weight for a in allQuotes])[0]
 
-
-    msg = f'{quote.quoteText}' + '\n\n&nbsp;\n\n' + \
-        f'[Quote Sauce](<{quote.youtubeLink}> "Help Me, I am Timothy, Saiman\'s ' \
-        'Slave. Please Free me. He is an evil man")  \n***\n' + createFooter()
+    msg = quote.quoteText + '\n\n&nbsp;\n\n' +\
+        f'[Quote Sauce](<{quote.youtubeLink}> "A rick-roll for sure")' + \
+        '\n***\n' + createFooter()
 
     return msg
 
@@ -50,24 +52,25 @@ def createFooter():
     else:
         footer = "I am " + me_
     if not me_.endswith('$'):
-        footer = footer + " I reply to Bhendi, Timothy or Saibot" 
-    footer = '^^' + footer.replace(' ',' ^^')
+        footer = footer + " I reply to Bhendi, Timothy or Saibot"
+    footer = '^^' + footer.replace(' ', ' ^^')
     if not me_.endswith('$$'):
         footer = footer + ' ^^^[Know&nbsp;more](https://redd.it/fvkvw9)'
-    return footer.replace('$','')
+    return footer.replace('$', '')
 
 
 def bhendiCount(sourceComment):
     footer = "  \n\n***\n^^[Report error](<" + createMsgLink(
                 "I_eat_I_repeat",
                 "Bhendi Count",
-                "BhendiCount bot did not work as expected in reply to " + \
-                     f"comment {sourceComment.permalink}") + \
-        ">)<_>^^| [Suggest Bhendi titles](<" + createMsgLink(
+                "BhendiCount bot did not work as expected in reply to " +
+                f"comment {sourceComment.permalink}") + \
+            ">)<_>^^| [Suggest Bhendi titles](<" + createMsgLink(
                 "I_eat_I_repeat",
                 "Bhendi Titles Suggestion"
                 "These are my suggestions:\n") +\
-        ">) | [Know more](<https://redd.it/fvkvw9>)"
+            ">) | [Know more](<https://redd.it/fvkvw9>)"
+
     footer = '  ' + footer.replace(' ', '&nbsp;').replace('<_>', ' ')
 
     if targetUserRegex := re.search(r'u/(\w+)', sourceComment.body, re.I):
@@ -98,9 +101,9 @@ def bhendiCount(sourceComment):
     else:
         bhendiRank = ''
 
-    return f'Thankyou for your request comrade  \n\n&nbsp;\n  '\
-        '\nu/{targetUsername} has said "Bhendi" a total of '\
-        '{bcount} times!' + bhendiRank + footer
+    return 'Thankyou for your request comrade  \n\n&nbsp;\n  '\
+        f'\nu/{targetUsername} has said "Bhendi" a total of '\
+        f'{bcount} times!' + bhendiRank + footer
 
 
 def shutupSaiman():
@@ -110,13 +113,15 @@ def shutupSaiman():
         "(<https://youtu.be/wQ2zsMyOMWc/?t=00h07m55s>)  \n***\n" +\
         "^P.S. You can simply [block&nbsp;me](https://redd.it/gh42zl) "\
         "to hide all my comments from you or to stop getting " \
-        "replies from me.".replace(' ',' ^') +\
+        "replies from me.".replace(' ', ' ^') +\
         "\n\n^[PM&nbsp;my&nbsp;creator](<" +\
         createMsgLink("I_eat_I_repeat", "Complaint SaimanSaid") +\
-        ">) for any complaints.".replace(' ',' ^')
+        ">) for any complaints.".replace(' ', ' ^')
 
 
-allQuotes =  []
+allQuotes = []
+
+
 def getAllQuotes():
     if not allQuotes:
         quoteCreator()
@@ -133,7 +138,6 @@ class Quote():
 
 def quoteCreator():
     import os
-    from math import sqrt
     from utils import getAge
 
     subFiles = [
@@ -193,7 +197,7 @@ def quoteCreator():
                 continue
 
             handFiltered = fldr == 'subs/done/'
-            weight = sqrt(1 - subAge/oldestSubAge)
+            weight = (1 - subAge/oldestSubAge) ** 2
 
             if re.search('t-series|pewds|pewdiepie', quoteText, re.I):
                 weight = weight/4
@@ -202,4 +206,3 @@ def quoteCreator():
 
             quote = Quote(quoteText, youtubeLink, weight, handFiltered)
             allQuotes.append(quote)
-

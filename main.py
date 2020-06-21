@@ -1,9 +1,6 @@
 from prawcore.exceptions import RequestException, ServerError
-import os
 import re
 from Reddit import reddit
-import signal
-import sys
 import time
 from utils import (
     SignalHandler,
@@ -23,6 +20,8 @@ from quotes import (
 
 
 signalHandler = SignalHandler()
+
+
 def main():
 
     downloadNewSubtitles()
