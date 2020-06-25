@@ -22,14 +22,26 @@ def happyCakeday():
         randomQuote() + '\u200e'
 
 
-whoAmI = None
+whoAmIs = None
 
 
 def getWhoAmI():
-    if whoAmI is None:
+    global whoAmIs
+    if whoAmIs is None:
         wikiPg = reddit.subreddit("SaimanSaid").wiki["whoami"].content_md
-        return [a.strip() for a in wikiPg.splitlines() if a]
-    return whoAmI
+        whoAmIs = [a.strip() for a in wikiPg.splitlines() if a]
+    return random.choice(whoAmIs).strip()
+
+
+rickRolls = None
+
+
+def getRickRoll():
+    global rickRolls
+    if rickRolls is None:
+        wikiPg = reddit.subreddit("SaimanSaid").wiki["rickrolls"].content_md
+        rickRolls = re.findall(r'https?://youtu[^\s]+', wikiPg)
+    return random.choice(rickRolls)
 
 
 def randomQuote(quote=None):
@@ -38,24 +50,30 @@ def randomQuote(quote=None):
         allQuotes = getAllQuotes()
         quote = random.choices(allQuotes, [a.weight for a in allQuotes])[0]
 
+    if random.randint(0, 100):
+        youtubeLink = quote.youtubeLink
+    else:
+        youtubeLink = getRickRoll()
+
     msg = quote.quoteText + '\n\n&nbsp;\n\n' +\
-        f'[Quote Sauce](<{quote.youtubeLink}> "A rick-roll for sure")' + \
+        f'[Quote Sauce](<{youtubeLink}> "A rick-roll for sure")' + \
         '\n***\n' + createFooter()
 
     return msg
 
 
 def createFooter():
-    me_ = random.choice(getWhoAmI()).strip()
-    if me_.startswith('$'):
-        footer = me_
-    else:
-        footer = "I am " + me_
+    me_ = getWhoAmI()
+    footer = me_
+
+    if not me_.startswith('$'):
+        footer = "I am " + footer
     if not me_.endswith('$'):
         footer = footer + " I reply to Bhendi, Timothy or Saibot"
-    footer = '^^' + footer.replace(' ', ' ^^')
     if not me_.endswith('$$'):
-        footer = footer + ' ^^^[Know&nbsp;more](https://redd.it/fvkvw9)'
+        footer = footer + ' ^[Know&nbsp;more](https://redd.it/fvkvw9)'
+
+    footer = '^^' + footer.replace(' ', ' ^^')
     return footer.replace('$', '')
 
 
