@@ -1,6 +1,7 @@
 import re
 import os
 import sys
+from datetime import datetime, date
 
 from Reddit import reddit
 
@@ -13,7 +14,7 @@ class SignalHandler():
         import signal
         signal.signal(signal.SIGINT, self._signalHandler)
         signal.signal(signal.SIGTERM, self._signalHandler)
-        self.exitCondition = False
+        self.exitWhenLoopEnds = False
         self.inLoop = False
 
     def _signalHandler(self, signal, frame):
@@ -21,12 +22,12 @@ class SignalHandler():
         if not self.inLoop:
             sys.exit(0)
         else:
-            self.exitCondition = True
+            self.exitWhenLoopEnds = True
 
     def loopEnd(self):
         self.inLoop = False
 
-        if self.exitCondition:
+        if self.exitWhenLoopEnds:
             sys.exit(0)
 
     def loopStart(self):
@@ -35,18 +36,12 @@ class SignalHandler():
 
 def cakedayCheck(comment):
     if comment.author in cakedayRedditors:
-        # Already Wished
         return False
-
-    createdUtc = comment.author.created_utc + 3600 * 24 * 365
-    currentUtc = utcTime()
-
-    while(currentUtc > createdUtc):
-        if currentUtc - createdUtc < 3600 * 24:
-            cakedayRedditors.append(comment.author)
-            return True
-        createdUtc += 3600 * 24 * 365
+    if comment.__dict__.get("author_cakeday"):
+        cakedayRedditors.append(comment.author)
+        return True
     return False
+
 
 
 def commentCheck():
@@ -70,7 +65,7 @@ def commentCheck():
         elif comment.score < 0 \
                 and "Quote Sauce" in comment.body\
                 and "\u200e" not in comment.body\
-                and utcTime() - comment.created_utc < 5000:
+                and utcnow().timestamp() - comment.created_utc < 5000:
             comment.refresh()
             if len(comment.replies) == 0:
                 from quotes import randomQuote
@@ -124,14 +119,8 @@ def updateKnowmore():
               f"and {unfilteredQuotes} sub quotes")
 
 
-def utcTime():
-    from datetime import datetime
-    return datetime.utcnow().timestamp()
-
-
 def getAge(timestamp):
     # timestamp in format YYYYMMDD
-    from datetime import date
     d = int(timestamp)
     return (date.today() - date(d // 10000, d // 100 % 100, d % 100)).days
 

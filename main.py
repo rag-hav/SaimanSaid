@@ -48,7 +48,8 @@ def main():
                 or re.search(r"\bre+post\b", comment.body, re.I):
             continue
 
-        if re.search(r"chup|shut ?up|block|stop", comment.body, re.I) \
+        if re.search(r"\b(chup|shut ?(the)? ?(fuck)? ?up|stop)\b",
+                     comment.body, re.I) \
                 and comment.parent().author == me:
             print(f"Replying to '{comment.permalink}' with shutupSaiman")
             replyToComment(comment, shutupSaiman())
@@ -84,5 +85,5 @@ if __name__ == "__main__":
             print(e)
             time.sleep(60)
         else:
-            raise "Program Finished Abnormally"
+            print("Program ended. It aint supposed to")
             break
