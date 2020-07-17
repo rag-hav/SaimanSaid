@@ -7,6 +7,8 @@ from Reddit import reddit
 
 cakedayRedditors = []
 
+def utcTime():
+    return datetime.utcnow().timestamp()
 
 class SignalHandler():
 
@@ -43,7 +45,6 @@ def cakedayCheck(comment):
     return False
 
 
-
 def commentCheck():
     for comment in reddit.user.me().comments.new():
 
@@ -65,22 +66,25 @@ def commentCheck():
         elif comment.score < 0 \
                 and "Quote Sauce" in comment.body\
                 and "\u200e" not in comment.body\
-                and utcnow().timestamp() - comment.created_utc < 5000:
+                and utcTime()  - comment.created_utc < 5000:
             comment.refresh()
             if len(comment.replies) == 0:
                 from quotes import randomQuote
                 comment.edit(randomQuote() + '\u200e')
                 print(f"Pulled a sneaky one on {comment.permalink}")
 
+def blockRedditor(redditor):
+    print("User Blocked: " + redditor.name)
+    reddit.redditor("I_eat_I_repeat").message(
+        "User Blocked", 'u/' + redditor.name)
+    redditor.block()
+
 
 def inboxCheck():
     for msg in reddit.inbox.messages():
         if msg.subject == "Block me":
             msg.reply("Okay done")
-            print("User Blocked: " + msg.author.name)
-            reddit.redditor("I_eat_I_repeat").message(
-                "User Blocked", 'u/' + msg.author.name)
-            msg.author.block()
+            blockRedditor(msg.author)
 
 
 def replyToComment(comment, replyTxt):

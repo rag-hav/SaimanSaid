@@ -4,6 +4,7 @@ from Reddit import reddit
 import time
 from utils import (
     SignalHandler,
+    blockUser,
     cakedayCheck,
     commentCheck,
     downloadNewSubtitles,
@@ -71,6 +72,10 @@ def main():
         elif re.search(r"bhendicount", comment.body, re.I):
             print(f"Replying to '{comment.permalink}' with bhendi count")
             replyToComment(comment, bhendiCount(comment))
+
+        elif re.search(r"!(ignore|block)", comment.body, re.I):
+            if comment.parent.author == me:
+                blockUser(comment.author)
 
         signalHandler.loopEnd()
 
