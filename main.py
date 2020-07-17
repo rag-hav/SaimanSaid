@@ -4,7 +4,7 @@ from Reddit import reddit
 import time
 from utils import (
     SignalHandler,
-    blockUser,
+    blockRedditor,
     cakedayCheck,
     commentCheck,
     downloadNewSubtitles,
@@ -75,7 +75,7 @@ def main():
 
         elif re.search(r"!(ignore|block)", comment.body, re.I):
             if comment.parent.author == me:
-                blockUser(comment.author)
+                blockRedditor(comment.author)
 
         signalHandler.loopEnd()
 
