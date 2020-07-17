@@ -46,6 +46,7 @@ def cakedayCheck(comment):
 
 
 def commentCheck():
+    print("Checking old comments")
     for comment in reddit.user.me().comments.new():
 
         # Get Already wished redditors btw runs
@@ -81,6 +82,7 @@ def blockRedditor(redditor):
 
 
 def inboxCheck():
+    print("Checking Inbox")
     for msg in reddit.inbox.messages():
         if msg.subject == "Block me":
             msg.reply("Okay done")
@@ -95,6 +97,7 @@ def replyToComment(comment, replyTxt):
 
 
 def updateKnowmore():
+    print("Counting quotes")
     from quotes import getAllQuotes
 
     allQuotes = getAllQuotes()
@@ -143,6 +146,7 @@ def _processSubtitle(vId):
 
 
 def downloadNewSubtitles():
+    print("Checking for new subtitles")
     from youtube_dl import YoutubeDL
 
     playlist = 'https://www.youtube.com/playlist?list=UUy9cb7U-Asbhbum0ZXArvfQ'
