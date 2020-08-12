@@ -39,7 +39,15 @@ class SignalHandler():
 def cakedayCheck(comment):
     if comment.author in cakedayRedditors:
         return False
-    if comment.__dict__.get("author_cakeday"):
+
+
+    timeDiff = utcTime() - datetime.fromtimestamp(comment.author.created_utc)
+    res = timeDiff.days % 365 == 0
+
+    if res != bool(comment.__dict__.get("author_cakeday")):
+        print("Contradiction")
+
+    if res:
         cakedayRedditors.append(comment.author)
         return True
     return False
