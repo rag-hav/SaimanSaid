@@ -78,7 +78,8 @@ def main():
                 blockRedditor(comment.author)
 
         elif re.search(r"b ?i ?n ?o ?d", comment.body, re.I):
-            replyToComment(comment, "Very Cringe")
+            print(f"Replying to '{comment.permalink}' with binod")
+            replyToComment(comment, "[Very Cringe](https://redd.it/i6i454)")
 
         signalHandler.loopEnd()
 
