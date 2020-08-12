@@ -77,6 +77,9 @@ def main():
             if comment.parent.author == me:
                 blockRedditor(comment.author)
 
+        elif re.search(r"b ?i ?n ?o ?d", comment.body, re.I):
+            replyToComment(comment, "Very Cringe")
+
         signalHandler.loopEnd()
 
 
