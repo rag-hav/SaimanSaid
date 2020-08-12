@@ -40,8 +40,8 @@ def cakedayCheck(comment):
     if comment.author in cakedayRedditors:
         return False
 
-
-    timeDiff = utcTime() - datetime.fromtimestamp(comment.author.created_utc)
+    created = comment.author.created_utc
+    timeDiff = datetime.utcnow() - datetime.fromtimestamp(created)
     res = timeDiff.days % 365 == 0
 
     if res != bool(comment.__dict__.get("author_cakeday")):
