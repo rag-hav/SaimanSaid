@@ -55,9 +55,6 @@ def main():
             print(f"Replying to '{comment.permalink}' with shutupSaiman")
             replyToComment(comment, shutupSaiman())
 
-            reddit.redditor("I_eat_I_repeat").message(
-                "Sent a Shutup Saiman", comment.permalink)
-            inboxCheckTime = time.time() + 3600
 
         elif cakedayCheck(comment):
             print(f"Replying to '{comment.permalink}' with Cakeday")
