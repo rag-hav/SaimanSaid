@@ -23,13 +23,19 @@ def happyCakeday():
 
 
 whoAmIs = None
+rickrollChance = 100
 
 
 def getWhoAmI():
     global whoAmIs
+    global rickrollChance
     if whoAmIs is None:
         wikiPg = reddit.subreddit("SaimanSaid").wiki["whoami"].content_md
-        whoAmIs = [a.strip() for a in wikiPg.splitlines() if a]
+        for line in wikiPg.splitlines():
+            if line.isdigit():
+                rickrollChance = int(line)
+                break
+        whoAmIs = [a.strip() for a in wikiPg.splitlines() if a and not a.isdigit()]
     return random.choice(whoAmIs).strip()
 
 
@@ -50,7 +56,7 @@ def randomQuote(quote=None):
         allQuotes = getAllQuotes()
         quote = random.choices(allQuotes, [a.weight for a in allQuotes])[0]
 
-    if random.randint(0, 100):
+    if random.randint(0, rickrollChance):
         youtubeLink = quote.youtubeLink
     else:
         youtubeLink = getRickRoll()
@@ -79,15 +85,15 @@ def createFooter():
 
 def bhendiCount(sourceComment):
     footer = "  \n\n***\n^^[Report error](<" + createMsgLink(
-                "I_eat_I_repeat",
-                "Bhendi Count",
-                "BhendiCount bot did not work as expected in reply to " +
-                f"comment {sourceComment.permalink}") + \
-            ">)<_>^^| [Suggest Bhendi titles](<" + createMsgLink(
-                "I_eat_I_repeat",
-                "Bhendi Titles Suggestion"
-                "These are my suggestions:\n") +\
-            ">) | [Know more](<https://redd.it/fvkvw9>)"
+        "I_eat_I_repeat",
+        "Bhendi Count",
+        "BhendiCount bot did not work as expected in reply to " +
+        f"comment {sourceComment.permalink}") + \
+        ">)<_>^^| [Suggest Bhendi titles](<" + createMsgLink(
+        "I_eat_I_repeat",
+        "Bhendi Titles Suggestion"
+        "These are my suggestions:\n") +\
+        ">) | [Know more](<https://redd.it/fvkvw9>)"
 
     footer = '  ' + footer.replace(' ', '&nbsp;').replace('<_>', ' ')
 

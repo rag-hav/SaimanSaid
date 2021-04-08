@@ -7,8 +7,10 @@ from Reddit import reddit
 
 cakedayRedditors = []
 
+
 def utcTime():
     return datetime.utcnow().timestamp()
+
 
 class SignalHandler():
 
@@ -75,12 +77,13 @@ def commentCheck():
         elif comment.score < 0 \
                 and "Quote Sauce" in comment.body\
                 and "\u200e" not in comment.body\
-                and utcTime()  - comment.created_utc < 5000:
+                and utcTime() - comment.created_utc < 5000:
             comment.refresh()
             if len(comment.replies) == 0:
                 from quotes import randomQuote
                 comment.edit(randomQuote() + '\u200e')
                 print(f"Pulled a sneaky one on {comment.permalink}")
+
 
 def blockRedditor(redditor):
     print("User Blocked: " + redditor.name)
@@ -184,3 +187,8 @@ def downloadNewSubtitles():
             else:
                 ydl.process_ie_result(vid, download=True)
                 _processSubtitle(vid['id'])
+
+
+def getActiveSubs():
+    wikiPg = reddit.subreddit("SaimanSaid").wiki["activesubs"].content_md
+    return "+".join([a.strip() for a in wikiPg.splitlines() if a])

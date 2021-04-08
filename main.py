@@ -8,6 +8,7 @@ from utils import (
     cakedayCheck,
     commentCheck,
     downloadNewSubtitles,
+    getActiveSubs,
     inboxCheck,
     replyToComment,
     updateKnowmore,
@@ -32,7 +33,7 @@ def main():
     inboxCheckTime = 0
     me = reddit.user.me()
 
-    for comment in reddit.subreddit("SaimanSays").stream.comments():
+    for comment in reddit.subreddit(getActiveSubs()).stream.comments():
 
         signalHandler.loopStart()
 
@@ -54,7 +55,6 @@ def main():
                 and comment.parent().author == me:
             print(f"Replying to '{comment.permalink}' with shutupSaiman")
             replyToComment(comment, shutupSaiman())
-
 
         elif cakedayCheck(comment):
             print(f"Replying to '{comment.permalink}' with Cakeday")
