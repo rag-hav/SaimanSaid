@@ -3,6 +3,8 @@ import os
 import sys
 from datetime import datetime, date
 
+from prawcore.exceptions import NotFound
+
 from Reddit import reddit
 
 cakedayRedditors = []
@@ -42,12 +44,16 @@ def cakedayCheck(comment):
     if comment.author in cakedayRedditors:
         return False
 
-    created = comment.author.created_utc
-    timeDiff = datetime.utcnow() - datetime.fromtimestamp(created)
-    res = timeDiff.days % 365 == 0
+    try:
+        created = comment.author.created_utc
+        timeDiff = datetime.utcnow() - datetime.fromtimestamp(created)
+        res = timeDiff.days % 365 == 0
 
-    if res != bool(comment.__dict__.get("author_cakeday")):
-        print("Contradiction")
+    except NotFound:
+        try:
+            res = bool(comment.__dict__.get("author_cakeday"))
+        except:
+            return False
 
     if res:
         cakedayRedditors.append(comment.author)
