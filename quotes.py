@@ -97,7 +97,7 @@ def bhendiCount(sourceComment):
 
     footer = '  ' + footer.replace(' ', '&nbsp;').replace('<_>', ' ')
 
-    if targetUserRegex := re.search(r'u/(\w+)', sourceComment.body, re.I):
+    if targetUserRegex := re.search(r'u/(\S+)', sourceComment.body, re.I):
         targetUsername = targetUserRegex.group(1)
         targetRedditor = reddit.redditor(targetUsername)
     else:

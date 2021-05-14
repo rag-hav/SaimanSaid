@@ -113,36 +113,6 @@ def replyToComment(comment, replyTxt):
     print("\tSuccess: " + replyComment.id)
 
 
-def updateKnowmore():
-    print("Counting quotes")
-    from quotes import getAllQuotes
-
-    allQuotes = getAllQuotes()
-    filteredQuotes, unfilteredQuotes = 0, 0
-    for quote in allQuotes:
-        if quote.handFiltered:
-            filteredQuotes += 1
-        else:
-            unfilteredQuotes += 1
-
-    Knowmore = reddit.submission("fvkvw9")
-    srch = r"Currently, the bot has (\d+) filtered quotes and (\d+) "\
-        r"unfiltered quotes in its database"
-    oldFilteredQts, oldUnfilteredQts = re.search(
-        srch, Knowmore.selftext).groups()
-
-    if int(oldFilteredQts) != filteredQuotes or int(
-            oldUnfilteredQts) != unfilteredQuotes:
-        newBody = re.sub(
-            srch,
-            f"Currently, the bot has {filteredQuotes} filtered quotes "
-            f"and {unfilteredQuotes} unfiltered quotes in its database",
-            Knowmore.selftext)
-        Knowmore.edit(newBody)
-        print(f"Knowmore Updated: {filteredQuotes} done quotes "
-              f"and {unfilteredQuotes} sub quotes")
-
-
 def getAge(timestamp):
     # timestamp in format YYYYMMDD
     d = int(timestamp)

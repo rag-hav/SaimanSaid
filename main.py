@@ -11,7 +11,6 @@ from utils import (
     getActiveSubs,
     inboxCheck,
     replyToComment,
-    updateKnowmore,
 )
 from quotes import (
     bhendiCount,
@@ -27,7 +26,6 @@ signalHandler = SignalHandler()
 def main():
 
     downloadNewSubtitles()
-    updateKnowmore()
 
     commentCheckTime = 0
     inboxCheckTime = 0
