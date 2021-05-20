@@ -102,6 +102,7 @@ def bhendiCount(sourceComment):
         targetRedditor = reddit.redditor(targetUsername)
     else:
         targetRedditor = sourceComment.parent().author
+        targetUsername = sourceComment.parent().author
 
     try:
         targetRedditor.id
