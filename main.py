@@ -72,9 +72,9 @@ def main():
             if comment.parent.author == me:
                 blockRedditor(comment.author)
 
-        elif re.match(r"b ?i ?n ?o ?d", comment.body, re.I):
-            print(f"Replying to '{comment.permalink}' with binod")
-            replyToComment(comment, "[Very Cringe](https://redd.it/i6i454)")
+        elif re.match(r"serpentine", comment.body, re.I):
+            print(f"Replying to '{comment.permalink}' with repost check")
+            replyToComment(comment.submission, "This is an automated action \n\nu/repostsleuthbot")
 
         signalHandler.loopEnd()
 
