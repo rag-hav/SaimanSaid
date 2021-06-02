@@ -59,7 +59,7 @@ def main():
             replyToComment(comment, happyCakeday())
 
         elif re.search(
-            r"\bBh[ei]+ndi\b|\bSai(man)?-?(Said| ?bot)\b|\bTimothy\b",
+            r"\bBh[ei]+ndi\b|\bSai(man)?-?(Said| ?bot)\b|\bTimothy\b|\bsaiman\b",
                 comment.body, re.I):
             print(f"Replying to '{comment.permalink}' with random quote")
             replyToComment(comment, randomQuote())

@@ -75,7 +75,7 @@ def createFooter():
     if not me_.startswith('$'):
         footer = "I am " + footer
     if not me_.endswith('$'):
-        footer = footer + " I reply to Bhendi, Timothy or Saibot"
+        footer = footer + " I reply to Bhendi, Timothy, Saiman or Saibot"
     if not me_.endswith('$$'):
         footer = footer + ' ^[Know&nbsp;more](https://redd.it/fvkvw9)'
 
