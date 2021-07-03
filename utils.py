@@ -3,7 +3,7 @@ import os
 import sys
 from datetime import datetime, date
 
-from prawcore.exceptions import NotFound
+from prawcore.exceptions import NotFound, RedditAPIException
 
 from Reddit import reddit
 
@@ -108,9 +108,12 @@ def inboxCheck():
 
 def replyToComment(comment, replyTxt):
 
-    replyComment = comment.reply(replyTxt)
-    comment.save()
-    print("\tSuccess: " + replyComment.id)
+    try:
+        replyComment = comment.reply(replyTxt)
+        comment.save()
+        print("\tSuccess: " + replyComment.id)
+    except RedditAPIException as e:
+        print(e)
 
 
 def getAge(timestamp):
