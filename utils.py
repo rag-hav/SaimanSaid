@@ -3,7 +3,8 @@ import os
 import sys
 from datetime import datetime, date
 
-from prawcore.exceptions import NotFound, RedditAPIException
+from prawcore.exceptions import NotFound
+from praw.exceptions import RedditAPIException
 
 from Reddit import reddit
 
