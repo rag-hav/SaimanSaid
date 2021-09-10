@@ -72,9 +72,13 @@ def main():
             if comment.parent.author == me:
                 blockRedditor(comment.author)
 
-        elif re.match(r"serpentine", comment.body, re.I):
+        elif comment.body.lower() == "serpentine":
             print(f"Replying to '{comment.permalink}' with repost check")
             replyToComment(comment.submission, "This is an automated action \n\nu/repostsleuthbot")
+
+        elif comment.body.lower() == "sus":
+            print(f"Replying to '{comment.permalink}' with amongus")
+            replyToComment(comment.submission, "amogus")
 
         signalHandler.loopEnd()
 
