@@ -78,7 +78,7 @@ def main():
 
         elif comment.body.lower() == "sus":
             print(f"Replying to '{comment.permalink}' with amongus")
-            replyToComment(comment.submission, "amogus")
+            replyToComment(comment, "amogus")
 
         signalHandler.loopEnd()
 
