@@ -1,2 +1,2 @@
-praw==7.3.0
+praw==7.4.0
 youtube-dl

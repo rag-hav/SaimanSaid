@@ -1,5 +1,13 @@
+from quotes import (
+    bhendiCount,
+    happyCakeday,
+    randomQuote,
+    shutupSaiman,
+)
+from functools import lru_cache
 import re
 import os
+import json
 import sys
 from datetime import datetime, date
 
@@ -53,7 +61,8 @@ def cakedayCheck(comment):
     except NotFound:
         try:
             res = bool(comment.__dict__.get("author_cakeday"))
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     if res:
@@ -64,7 +73,11 @@ def cakedayCheck(comment):
 
 def commentCheck():
     print("Checking old comments")
-    for comment in reddit.user.me().comments.new():
+    me = reddit.user.me()
+    if not me:
+        return
+
+    for comment in me.comments.new():
 
         # Get Already wished redditors btw runs
         if re.search(r"^Happy cakeday", comment.body):
@@ -72,12 +85,7 @@ def commentCheck():
 
         # Delete bad comnents
         if comment.score < -4:
-            parentId = comment.parent().permalink.replace(
-                "reddit", "removeddit")
             comment.delete()
-            reddit.redditor("I_eat_I_repeat").message(
-                "Comment deleted",
-                comment.body + '\n\n' + parentId)
             print("Deleted comment {parentId}")
 
         # Pull a sneaky one
@@ -105,6 +113,8 @@ def inboxCheck():
         if msg.subject == "Block me":
             msg.reply("Okay done")
             blockRedditor(msg.author)
+        else:
+            processComment(msg)
 
 
 def replyToComment(comment, replyTxt):
@@ -159,7 +169,7 @@ def downloadNewSubtitles():
 
     with YoutubeDL(ydlOpts) as ydl:
         for vid in playlistRes['entries']:
-            for subFile in os.listdir("subs/") + os.listdir("subs/done/"):
+            for subFile in os.listdir("subs/"):
                 if vid['id'] in subFile:
                     if getAge(subFile[:8]) > 30:
                         return
@@ -169,6 +179,58 @@ def downloadNewSubtitles():
                 _processSubtitle(vid['id'])
 
 
+@lru_cache
 def getActiveSubs():
     wikiPg = reddit.subreddit("SaimanSaid").wiki["activesubs"].content_md
     return "+".join([a.strip() for a in wikiPg.splitlines() if a])
+
+
+@lru_cache
+def getPermanentRespones():
+    # Get a dict containing premanent responses
+    # {"hi saibot", "hello, user"}
+    wikiPg = reddit.subreddit(
+        "SaimanSaid").wiki["permanent_responses"].content_md
+    return json.loads(wikiPg)
+
+
+def processComment(comment):
+
+    me = reddit.user.me()
+    if comment.saved or comment.author == me:
+        return
+
+    if re.search(r"\b(chup|shut ?(the)? ?(fuck)? ?up|stop)\b",
+                 comment.body, re.I) \
+            and comment.parent().author == me:
+        print(f"Replying to '{comment.permalink}' with shutupSaiman")
+        replyToComment(comment, shutupSaiman())
+
+    elif cakedayCheck(comment):
+        print(f"Replying to '{comment.permalink}' with Cakeday")
+        replyToComment(comment, happyCakeday())
+
+    elif re.search(
+        r"\b(Bh[ei]+ndi|Sai(man)?-?(Said| ?bot)|Timothy|saiman)\b",
+            comment.body, re.I):
+        print(f"Replying to '{comment.permalink}' with random quote")
+        replyToComment(comment, randomQuote())
+
+    elif re.search(r"bhendicount", comment.body, re.I):
+        print(f"Replying to '{comment.permalink}' with bhendi count")
+        replyToComment(comment, bhendiCount(comment))
+
+    elif re.search(r"!saibot (ignore|block)", comment.body, re.I):
+        if comment.parent.author == me:
+            blockRedditor(comment.author)
+
+    elif comment.body.lower() == "serpentine":
+        print(f"Replying to '{comment.permalink}' with repost check")
+        replyToComment(comment.submission,
+                       "This is an automated action \n\nu/repostsleuthbot")
+    else:
+        for reg, response in getPermanentRespones().items():
+            if re.compile(reg, re.I).search(comment.body):
+                print("replying with permanent response")
+                replyToComment(comment, response)
+                break

@@ -1,22 +1,13 @@
 from prawcore.exceptions import RequestException, ServerError
-import re
 from Reddit import reddit
 import time
 from utils import (
     SignalHandler,
-    blockRedditor,
-    cakedayCheck,
     commentCheck,
     downloadNewSubtitles,
     getActiveSubs,
     inboxCheck,
-    replyToComment,
-)
-from quotes import (
-    bhendiCount,
-    happyCakeday,
-    randomQuote,
-    shutupSaiman,
+    processComment,
 )
 
 
@@ -29,7 +20,6 @@ def main():
 
     commentCheckTime = 0
     inboxCheckTime = 0
-    me = reddit.user.me()
 
     for comment in reddit.subreddit(getActiveSubs()).stream.comments():
 
@@ -43,43 +33,7 @@ def main():
             commentCheck()
             commentCheckTime = time.time() + 1800
 
-        if comment.saved \
-                or comment.author == me \
-                or re.search(r"\bre+post\b", comment.body, re.I):
-            continue
-
-        if re.search(r"\b(chup|shut ?(the)? ?(fuck)? ?up|stop)\b",
-                     comment.body, re.I) \
-                and comment.parent().author == me:
-            print(f"Replying to '{comment.permalink}' with shutupSaiman")
-            replyToComment(comment, shutupSaiman())
-
-        elif cakedayCheck(comment):
-            print(f"Replying to '{comment.permalink}' with Cakeday")
-            replyToComment(comment, happyCakeday())
-
-        elif re.search(
-            r"\bBh[ei]+ndi\b|\bSai(man)?-?(Said| ?bot)\b|\bTimothy\b|\bsaiman\b",
-                comment.body, re.I):
-            print(f"Replying to '{comment.permalink}' with random quote")
-            replyToComment(comment, randomQuote())
-
-        elif re.search(r"bhendicount", comment.body, re.I):
-            print(f"Replying to '{comment.permalink}' with bhendi count")
-            replyToComment(comment, bhendiCount(comment))
-
-        elif re.search(r"!(ignore|block)", comment.body, re.I):
-            if comment.parent.author == me:
-                blockRedditor(comment.author)
-
-        elif comment.body.lower() == "serpentine":
-            print(f"Replying to '{comment.permalink}' with repost check")
-            replyToComment(comment.submission, "This is an automated action \n\nu/repostsleuthbot")
-
-        elif comment.body.lower() == "sus":
-            print(f"Replying to '{comment.permalink}' with amongus")
-            replyToComment(comment, "amogus")
-
+        processComment(comment)
         signalHandler.loopEnd()
 
 

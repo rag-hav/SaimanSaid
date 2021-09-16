@@ -11,10 +11,10 @@ def urlQuote(a):
 
 def createMsgLink(to=None, subject=None, message=None):
     from requests import Request
-    return Request(url="https://www.reddit.com/message/compose/", params={
+    return str(Request(url="https://www.reddit.com/message/compose/", params={
         "to": to,
         "subject": subject,
-        "message": message, }).prepare().url
+        "message": message, }).prepare().url)
 
 
 def happyCakeday():
@@ -35,7 +35,8 @@ def getWhoAmI():
             if line.isdigit():
                 rickrollChance = int(line)
                 break
-        whoAmIs = [a.strip() for a in wikiPg.splitlines() if a and not a.isdigit()]
+        whoAmIs = [a.strip()
+                   for a in wikiPg.splitlines() if a and not a.isdigit()]
     return random.choice(whoAmIs).strip()
 
 
@@ -165,14 +166,12 @@ def quoteCreator():
     import os
     from utils import getAge
 
-    subFiles = [
-        ("subs/", a) for a in os.listdir("subs/")] + [
-        ("subs/done/", a) for a in os.listdir("subs/done/")]
-    subFiles.remove(('subs/', 'done'))
+    subFiles = os.listdir("subs/")
+    fldr = "subs/"
 
-    oldestSubAge = getAge(min(int(a[:8]) for fldr, a in subFiles)) * 1.1
+    oldestSubAge = getAge(min(int(a[:8]) for a in subFiles)) * 1.1
 
-    for fldr, subFile in subFiles:
+    for subFile in subFiles:
 
         with open(fldr + subFile, 'r') as f:
             quotes = f.read().split('\n\n')
