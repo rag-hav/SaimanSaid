@@ -20,6 +20,7 @@ def main():
 
     commentCheckTime = 0
     inboxCheckTime = 0
+    me = reddit.user.me()
 
     for comment in reddit.subreddit(getActiveSubs()).stream.comments():
 
@@ -33,7 +34,9 @@ def main():
             commentCheck()
             commentCheckTime = time.time() + 1800
 
-        processComment(comment)
+        if not (comment.saved or comment.author == me):
+            processComment(comment)
+
         signalHandler.loopEnd()
 
 

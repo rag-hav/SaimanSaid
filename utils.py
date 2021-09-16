@@ -125,6 +125,8 @@ def replyToComment(comment, replyTxt):
         print("\tSuccess: " + replyComment.id)
     except RedditAPIException as e:
         print(e)
+    except AttributeError:
+        pass
 
 
 def getAge(timestamp):
@@ -197,8 +199,6 @@ def getPermanentRespones():
 def processComment(comment):
 
     me = reddit.user.me()
-    if comment.saved or comment.author == me:
-        return
 
     if re.search(r"\b(chup|shut ?(the)? ?(fuck)? ?up|stop)\b",
                  comment.body, re.I) \
