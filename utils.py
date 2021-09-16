@@ -113,8 +113,6 @@ def inboxCheck():
         if msg.subject == "Block me":
             msg.reply("Okay done")
             blockRedditor(msg.author)
-        else:
-            processComment(msg)
 
 
 def replyToComment(comment, replyTxt):
@@ -125,8 +123,6 @@ def replyToComment(comment, replyTxt):
         print("\tSuccess: " + replyComment.id)
     except RedditAPIException as e:
         print(e)
-    except AttributeError:
-        pass
 
 
 def getAge(timestamp):
