@@ -85,7 +85,7 @@ def commentCheck():
 
         # Delete bad comnents
         if comment.score < -4:
-            comment.delete()
+            # comment.delete()
             print("Deleted comment {parentId}")
 
         # Pull a sneaky one
