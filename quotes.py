@@ -112,7 +112,7 @@ def bhendiCount(sourceComment):
 
     bcount = 0
     for comment in targetRedditor.comments.new(limit=None):
-        if re.search(r'\bbhendi\b', comment.body, re.I):
+        for _ in re.finditer(r'\bbhendi\b', comment.body, re.I):
             bcount += 1
 
     bhendiRank = "  \nHe has been awarded the title of "
