@@ -42,7 +42,7 @@ def main():
 
 if __name__ == "__main__":
     print("Starting the bot")
-    while(True):
+    while True:
         try:
             main()
         # Network Issues

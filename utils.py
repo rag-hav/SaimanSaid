@@ -23,10 +23,10 @@ def utcTime():
     return datetime.utcnow().timestamp()
 
 
-class SignalHandler():
-
+class SignalHandler:
     def __init__(self):
         import signal
+
         signal.signal(signal.SIGINT, self._signalHandler)
         signal.signal(signal.SIGTERM, self._signalHandler)
         self.exitWhenLoopEnds = False
@@ -89,21 +89,23 @@ def commentCheck():
             print("Deleted comment {parentId}")
 
         # Pull a sneaky one
-        elif comment.score < 0 \
-                and "Quote Sauce" in comment.body\
-                and "\u200e" not in comment.body\
-                and utcTime() - comment.created_utc < 5000:
+        elif (
+            comment.score < 0
+            and "Quote Sauce" in comment.body
+            and "\u200e" not in comment.body
+            and utcTime() - comment.created_utc < 5000
+        ):
             comment.refresh()
             if len(comment.replies) == 0:
                 from quotes import randomQuote
-                comment.edit(randomQuote() + '\u200e')
+
+                comment.edit(randomQuote() + "\u200e")
                 print(f"Pulled a sneaky one on {comment.permalink}")
 
 
 def blockRedditor(redditor):
     print("User Blocked: " + redditor.name)
-    reddit.redditor("I_eat_I_repeat").message(
-        "User Blocked", 'u/' + redditor.name)
+    reddit.redditor("I_eat_I_repeat").message("User Blocked", "u/" + redditor.name)
     redditor.block()
 
 
@@ -135,10 +137,10 @@ def _processSubtitle(vId):
     # Checks if ydl has downloaded the subtitle and writes them to subs folder
     for file_ in os.listdir():
         if vId in file_:
-            with open(file_, 'r') as f:
+            with open(file_, "r") as f:
                 subData = f.read()
-            cleanSub = '\n\n'.join(a for a in subData.split('\n\n')[1:] if a)
-            with open('subs/' + file_.split('.')[0], 'w') as f:
+            cleanSub = "\n\n".join(a for a in subData.split("\n\n")[1:] if a)
+            with open("subs/" + file_.split(".")[0], "w") as f:
                 f.write(cleanSub)
             print("Downloaded Subtitle for " + vId)
             os.remove(file_)
@@ -148,12 +150,15 @@ def downloadNewSubtitles():
     print("Checking for new subtitles")
     from youtube_dl import YoutubeDL
 
-    playlist = 'https://www.youtube.com/playlist?list=UUy9cb7U-Asbhbum0ZXArvfQ'
+    playlist = "https://www.youtube.com/playlist?list=UUy9cb7U-Asbhbum0ZXArvfQ"
 
-    ydlOpts = {'ignoreerrors': True, 'no_warnings': True,
-               'quiet': True, 'outtmpl': '%(upload_date)s%(id)s',
-               'skip_download': True
-               }
+    ydlOpts = {
+        "ignoreerrors": True,
+        "no_warnings": True,
+        "quiet": True,
+        "outtmpl": "%(upload_date)s%(id)s",
+        "skip_download": True,
+    }
 
     with YoutubeDL(ydlOpts) as ydl:
         playlistRes = ydl.extract_info(playlist, download=False, process=False)
@@ -163,18 +168,18 @@ def downloadNewSubtitles():
         return
 
     # Youtubedl doesnt return the info dict if this option is passed
-    ydlOpts['writesubtitles'] = True
+    ydlOpts["writesubtitles"] = True
 
     with YoutubeDL(ydlOpts) as ydl:
-        for vid in playlistRes['entries']:
+        for vid in playlistRes["entries"]:
             for subFile in os.listdir("subs/"):
-                if vid['id'] in subFile:
+                if vid["id"] in subFile:
                     if getAge(subFile[:8]) > 30:
                         return
                     break
             else:
                 ydl.process_ie_result(vid, download=True)
-                _processSubtitle(vid['id'])
+                _processSubtitle(vid["id"])
 
 
 @lru_cache
@@ -187,8 +192,7 @@ def getActiveSubs():
 def getPermanentRespones():
     # Get a dict containing premanent responses
     # {"hi saibot", "hello, user"}
-    wikiPg = reddit.subreddit(
-        "SaimanSaid").wiki["permanent_responses"].content_md
+    wikiPg = reddit.subreddit("SaimanSaid").wiki["permanent_responses"].content_md
     return json.loads(wikiPg)
 
 
@@ -196,9 +200,10 @@ def processComment(comment):
 
     me = reddit.user.me()
 
-    if re.search(r"\b(chup|shut ?(the)? ?(fuck)? ?up|stop)\b",
-                 comment.body, re.I) \
-            and comment.parent().author == me:
+    if (
+        re.search(r"\b(chup|shut ?(the)? ?(fuck)? ?up|stop)\b", comment.body, re.I)
+        and comment.parent().author == me
+    ):
         print(f"Replying to '{comment.permalink}' with shutupSaiman")
         replyToComment(comment, shutupSaiman())
 
@@ -207,8 +212,8 @@ def processComment(comment):
         replyToComment(comment, happyCakeday())
 
     elif re.search(
-        r"\b(Bh[ei]+ndi|Sai(man)?-?(Said| ?bot)|Timothy|saiman)\b",
-            comment.body, re.I):
+        r"\b(Bh[ei]+ndi|Sai(man)?-?(Said| ?bot)|Timothy|saiman)\b", comment.body, re.I
+    ):
         print(f"Replying to '{comment.permalink}' with random quote")
         replyToComment(comment, randomQuote())
 
@@ -222,8 +227,9 @@ def processComment(comment):
 
     elif comment.body.lower() == "serpentine":
         print(f"Replying to '{comment.permalink}' with repost check")
-        replyToComment(comment.submission,
-                       "This is an automated action \n\nu/repostsleuthbot")
+        replyToComment(
+            comment.submission, "This is an automated action \n\nu/repostsleuthbot"
+        )
     else:
         for reg, response in getPermanentRespones().items():
             if re.compile(reg, re.I).search(comment.body):
